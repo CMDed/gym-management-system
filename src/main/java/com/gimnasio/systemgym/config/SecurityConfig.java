@@ -11,6 +11,9 @@ import org.springframework.security.web.header.writers.frameoptions.XFrameOption
 import org.springframework.security.web.util.matcher.RequestMatcher;
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest; // **IMPORTANTE: Usa esta importación**
 
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder; // Importar BCryptPasswordEncoder
+import org.springframework.security.crypto.password.PasswordEncoder; // Importar PasswordEncoder
+
 import static org.springframework.security.config.Customizer.withDefaults;
 
 @Configuration
@@ -35,5 +38,9 @@ public class SecurityConfig {
                 );
 
         return http.build();
+    }
+    @Bean // Este bean expone un PasswordEncoder para inyección
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
     }
 }
