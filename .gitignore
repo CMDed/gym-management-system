@@ -1,0 +1,52 @@
+# IntelliJ IDEA
+.idea/
+*.iml
+
+# Maven
+/target/
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+pom.xml.next
+release.properties
+dependency-reduced-pom.xml
+buildNumber.properties
+.mvn/wrapper/maven-wrapper.jar
+.flattened-pom.xml
+
+# Java
+*.class
+
+# Spring Boot
+/build/
+/src/main/resources/static/built/
+/src/main/resources/public/built/
+*.jar
+*.war
+*.zip
+*.tar.gz
+*.log
+log/
+logs/
+tmp/
+.env
+.settings
+.project
+.classpath
+
+# OS X
+.DS_Store
+
+# Windows
+Thumbs.db
+Desktop.ini
+
+# Eclipse
+.project
+.classpath
+.settings/
+
+# For Spring Security - if you ever store sensitive keys/configs:
+# application-dev.properties
+# application-prod.properties
+# application-secret.properties
