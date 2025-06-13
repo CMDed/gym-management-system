@@ -42,9 +42,17 @@ public class PagoService {
         pago.setFechaPago(LocalDateTime.now());
         pago.setMetodoPago(metodoPago);
         pago.setReferenciaTransaccion(referenciaTransaccion);
-        pago.setEstado(estado); // Ej. "COMPLETADO"
+        pago.setEstado(estado);
 
         return pagoRepository.save(pago);
+    }
+
+    @Transactional
+    public void eliminarPago(Long id) {
+        if (!pagoRepository.existsById(id)) {
+            throw new IllegalArgumentException("El pago con ID " + id + " no existe.");
+        }
+        pagoRepository.deleteById(id);
     }
 
     @Transactional(readOnly = true)

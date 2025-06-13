@@ -51,6 +51,18 @@ public class PagoController {
         }
     }
 
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> eliminarPago(@PathVariable Long id) {
+        try {
+            pagoService.eliminarPago(id);
+            return new ResponseEntity<>("Pago eliminado exitosamente", HttpStatus.NO_CONTENT);
+        } catch (IllegalArgumentException e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
+        } catch (Exception e) {
+            return new ResponseEntity<>("Error interno del servidor al eliminar pago: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
 
     @GetMapping
     public ResponseEntity<List<Pago>> obtenerTodosLosPagos() {

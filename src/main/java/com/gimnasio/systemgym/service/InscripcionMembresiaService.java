@@ -18,8 +18,8 @@ import java.util.Optional;
 public class InscripcionMembresiaService {
 
     private final InscripcionMembresiaRepository inscripcionMembresiaRepository;
-    private final MiembroService miembroService; // Necesitamos el servicio de Miembro
-    private final MembresiaService membresiaService; // Necesitamos el servicio de Membresia
+    private final MiembroService miembroService;
+    private final MembresiaService membresiaService;
 
     @Autowired
     public InscripcionMembresiaService(InscripcionMembresiaRepository inscripcionMembresiaRepository,
@@ -37,18 +37,16 @@ public class InscripcionMembresiaService {
         Membresia membresia = membresiaService.obtenerMembresiaPorId(membresiaId)
                 .orElseThrow(() -> new IllegalArgumentException("Membresía no encontrada."));
 
-        // Lógica para calcular fechas de inicio y fin
         LocalDate fechaInicio = LocalDate.now();
         LocalDate fechaFin = fechaInicio.plusDays(membresia.getDuracionDias());
 
-        // Crear la inscripción
         InscripcionMembresia inscripcion = new InscripcionMembresia();
         inscripcion.setMiembro(miembro);
         inscripcion.setMembresia(membresia);
         inscripcion.setFechaInicio(fechaInicio);
         inscripcion.setFechaFin(fechaFin);
-        inscripcion.setPrecioPagado(precioPagado); // Asegúrate de que el precio sea correcto aquí
-        inscripcion.setEstado("ACTIVA"); // Estado inicial
+        inscripcion.setPrecioPagado(precioPagado);
+        inscripcion.setEstado("ACTIVA");
         inscripcion.setFechaCreacion(LocalDateTime.now());
 
         return inscripcionMembresiaRepository.save(inscripcion);
@@ -57,6 +55,14 @@ public class InscripcionMembresiaService {
     @Transactional(readOnly = true)
     public Optional<InscripcionMembresia> obtenerInscripcionPorId(Long id) {
         return inscripcionMembresiaRepository.findById(id);
+    }
+
+    @Transactional
+    public void eliminarInscripcion(Long id) {
+        if (!inscripcionMembresiaRepository.existsById(id)) {
+            throw new IllegalArgumentException("La inscripción con ID " + id + " no existe.");
+        }
+        inscripcionMembresiaRepository.deleteById(id);
     }
 
     @Transactional(readOnly = true)
@@ -79,7 +85,7 @@ public class InscripcionMembresiaService {
         return inscripcionMembresiaRepository.save(inscripcion);
     }
 
-    // Método para verificar y actualizar el estado de las membresías vencidas (podría ser un job programado)
+
     @Transactional
     public void actualizarEstadosMembresiasVencidas() {
         List<InscripcionMembresia> inscripcionesActivas = inscripcionMembresiaRepository.findByEstado("ACTIVA");

@@ -16,8 +16,8 @@ import java.util.Optional;
 public class AsistenciaService {
 
     private final AsistenciaRepository asistenciaRepository;
-    private final MiembroService miembroService; // Necesitamos el servicio de Miembro
-    private final UsuarioService usuarioService; // Necesitamos el servicio de Usuario (registrador)
+    private final MiembroService miembroService;
+    private final UsuarioService usuarioService;
 
     @Autowired
     public AsistenciaService(AsistenciaRepository asistenciaRepository,
@@ -43,6 +43,14 @@ public class AsistenciaService {
         return asistenciaRepository.save(asistencia);
     }
 
+    @Transactional
+    public void eliminarAsistencia(Long id) {
+        if (!asistenciaRepository.existsById(id)) {
+            throw new IllegalArgumentException("La asistencia con ID " + id + " no existe.");
+        }
+        asistenciaRepository.deleteById(id);
+    }
+
     @Transactional(readOnly = true)
     public Optional<Asistencia> obtenerAsistenciaPorId(Long id) {
         return asistenciaRepository.findById(id);
@@ -59,6 +67,4 @@ public class AsistenciaService {
     public List<Asistencia> obtenerTodasLasAsistencias() {
         return asistenciaRepository.findAll();
     }
-
-    // Podrías añadir métodos para filtrar por fecha, por registrador, etc.
 }

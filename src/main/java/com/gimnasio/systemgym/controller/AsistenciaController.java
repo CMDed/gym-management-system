@@ -46,6 +46,18 @@ public class AsistenciaController {
         }
     }
 
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> eliminarAsistencia(@PathVariable Long id) {
+        try {
+            asistenciaService.eliminarAsistencia(id);
+            return new ResponseEntity<>("Asistencia eliminada exitosamente", HttpStatus.NO_CONTENT);
+        } catch (IllegalArgumentException e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
+        } catch (Exception e) {
+            return new ResponseEntity<>("Error interno del servidor al eliminar asistencia: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
     @GetMapping
     public ResponseEntity<List<Asistencia>> obtenerTodasLasAsistencias() {
         List<Asistencia> asistencias = asistenciaService.obtenerTodasLasAsistencias();

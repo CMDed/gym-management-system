@@ -3,7 +3,7 @@ package com.gimnasio.systemgym.service;
 import com.gimnasio.systemgym.model.Usuario;
 import com.gimnasio.systemgym.repository.UsuarioRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.password.PasswordEncoder; // Para encriptar contraseñas
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -14,7 +14,7 @@ import java.util.Optional;
 public class UsuarioService {
 
     private final UsuarioRepository usuarioRepository;
-    private final PasswordEncoder passwordEncoder; // Inyectamos el encriptador de contraseñas
+    private final PasswordEncoder passwordEncoder;
 
     // @Autowired
     public UsuarioService(UsuarioRepository usuarioRepository, PasswordEncoder passwordEncoder) {
@@ -30,10 +30,10 @@ public class UsuarioService {
         if (usuario.getEmail() != null && usuarioRepository.findByEmail(usuario.getEmail()).isPresent()) {
             throw new IllegalArgumentException("El email ya está registrado.");
         }
-        // Encriptar la contraseña antes de guardar
+
         usuario.setPassword(passwordEncoder.encode(usuario.getPassword()));
         if (usuario.getActivo() == null) {
-            usuario.setActivo(true); // Activo por defecto
+            usuario.setActivo(true);
         }
         return usuarioRepository.save(usuario);
     }
@@ -63,7 +63,7 @@ public class UsuarioService {
 
         existente.setNombre(usuarioActualizado.getNombre());
         existente.setApellido(usuarioActualizado.getApellido());
-        // El email solo se actualiza si no es null y no existe ya para otro usuario
+
         if (usuarioActualizado.getEmail() != null && !usuarioActualizado.getEmail().equals(existente.getEmail())) {
             if (usuarioRepository.findByEmail(usuarioActualizado.getEmail()).isPresent()) {
                 throw new IllegalArgumentException("El nuevo email ya está registrado para otro usuario.");
@@ -72,9 +72,6 @@ public class UsuarioService {
         }
         existente.setRol(usuarioActualizado.getRol());
         existente.setActivo(usuarioActualizado.getActivo());
-
-        // La contraseña debe ser actualizada por un método separado si no es la misma
-        // (no queremos encriptar una contraseña ya encriptada)
 
         return usuarioRepository.save(existente);
     }

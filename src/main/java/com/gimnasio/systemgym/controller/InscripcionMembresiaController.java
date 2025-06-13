@@ -67,6 +67,18 @@ public class InscripcionMembresiaController {
         }
     }
 
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> eliminarInscripcion(@PathVariable Long id) {
+        try {
+            inscripcionMembresiaService.eliminarInscripcion(id);
+            return new ResponseEntity<>("Inscripción eliminada exitosamente", HttpStatus.NO_CONTENT);
+        } catch (IllegalArgumentException e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
+        } catch (Exception e) {
+            return new ResponseEntity<>("Error interno del servidor al eliminar inscripción: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
     @PutMapping("/{id}/estado")
     public ResponseEntity<?> actualizarEstadoInscripcion(
             @PathVariable Long id,
