@@ -7,12 +7,10 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.header.writers.frameoptions.XFrameOptionsHeaderWriter;
 import org.springframework.security.web.header.writers.frameoptions.XFrameOptionsHeaderWriter.XFrameOptionsMode;
-//import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
-import org.springframework.security.web.util.matcher.RequestMatcher;
-import org.springframework.boot.autoconfigure.security.servlet.PathRequest; // **IMPORTANTE: Usa esta importación**
+import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder; // Importar BCryptPasswordEncoder
-import org.springframework.security.crypto.password.PasswordEncoder; // Importar PasswordEncoder
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import static org.springframework.security.config.Customizer.withDefaults;
 
@@ -24,14 +22,16 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .authorizeHttpRequests(authorize -> authorize
-                        // La forma recomendada y sin deprecación para H2 Console
-                        // **Usa org.springframework.boot.autoconfigure.security.servlet.PathRequest**
+                        .requestMatchers("/api/**").permitAll()
                         .requestMatchers(PathRequest.toH2Console()).permitAll()
                         .anyRequest().authenticated()
                 )
                 .formLogin(withDefaults())
                 .csrf(csrf -> csrf
+                        // Deshabilita CSRF para H2 Console
                         .ignoringRequestMatchers(PathRequest.toH2Console())
+                        // Deshabilita CSRF para todos los endpoints de la API
+                        .ignoringRequestMatchers("/api/**")
                 )
                 .headers(headers -> headers
                         .addHeaderWriter(new XFrameOptionsHeaderWriter(XFrameOptionsMode.SAMEORIGIN))
@@ -39,7 +39,8 @@ public class SecurityConfig {
 
         return http.build();
     }
-    @Bean // Este bean expone un PasswordEncoder para inyección
+
+    @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }

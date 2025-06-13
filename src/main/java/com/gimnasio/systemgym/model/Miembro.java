@@ -1,25 +1,25 @@
 package com.gimnasio.systemgym.model;
 
-import jakarta.persistence.*; // Importa las anotaciones de JPA
-import lombok.Data; // Importa la anotación @Data de Lombok
+import jakarta.persistence.*;
+import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
 
-import java.time.LocalDate; // Para fecha de nacimiento
-import java.time.LocalDateTime; // Para fecha de registro
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 
-@Entity // Indica que esta clase es una entidad JPA y se mapea a una tabla de BD
-@Table(name = "miembros") // Especifica el nombre de la tabla en la BD
-@Data // Anotación de Lombok: Genera getters, setters, toString, equals y hashCode automáticamente
-@NoArgsConstructor // Anotación de Lombok: Genera un constructor sin argumentos
-@AllArgsConstructor // Anotación de Lombok: Genera un constructor con todos los argumentos
+@Entity
+@Table(name = "miembros")
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class Miembro {
 
-    @Id // Marca el campo como la clave primaria
-    @GeneratedValue(strategy = GenerationType.IDENTITY) // Indica que el ID será auto-generado por la BD (IDENTITY para bases de datos como MySQL/PostgreSQL)
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "dni", unique = true, nullable = false, length = 20) // Mapea a la columna 'dni', es única, no nula y tiene longitud máxima
+    @Column(name = "dni", unique = true, nullable = false, length = 20)
     private String dni;
 
     @Column(name = "nombre", nullable = false, length = 100)
@@ -38,17 +38,15 @@ public class Miembro {
     private String telefono;
 
     @Column(name = "fecha_nacimiento", nullable = false)
-    private LocalDate fechaNacimiento; // Usamos LocalDate para solo la fecha
+    private LocalDate fechaNacimiento;
 
     @Column(name = "password", nullable = false, length = 255)
-    private String password; // Almacenaremos el hash de la contraseña
+    private String password;
 
     @Column(name = "fecha_registro", nullable = false)
-    private LocalDateTime fechaRegistro; // Usamos LocalDateTime para fecha y hora
+    private LocalDateTime fechaRegistro;
 
     @Column(name = "activo", nullable = false)
-    private Boolean activo; // Para saber si el miembro está activo
+    private Boolean activo;
 
-    // Nota: Lombok @Data ya genera los getters, setters, constructores, etc.
-    // No es necesario escribirlos explícitamente, lo cual es la magia de Lombok.
 }

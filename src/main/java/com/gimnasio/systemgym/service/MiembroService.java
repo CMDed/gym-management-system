@@ -2,48 +2,57 @@ package com.gimnasio.systemgym.service;
 
 import com.gimnasio.systemgym.model.Miembro;
 import com.gimnasio.systemgym.repository.MiembroRepository;
-import org.springframework.beans.factory.annotation.Autowired; // Para inyección de dependencias
-import org.springframework.stereotype.Service; // Para marcar la clase como un servicio
-import org.springframework.transaction.annotation.Transactional; // Para manejo de transacciones
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
-@Service // Marca esta clase como un componente de servicio de Spring
+@Service
 public class MiembroService {
 
     private final MiembroRepository miembroRepository;
+    private final PasswordEncoder passwordEncoder;
 
-    // Inyección de dependencias a través del constructor (forma recomendada)
     @Autowired
-    public MiembroService(MiembroRepository miembroRepository) {
+    public MiembroService(MiembroRepository miembroRepository, PasswordEncoder passwordEncoder) {
         this.miembroRepository = miembroRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
-    // --- Métodos de Lógica de Negocio ---
-
-    @Transactional // Garantiza que la operación se realice dentro de una transacción de BD
+    @Transactional
     public Miembro registrarNuevoMiembro(Miembro miembro) {
-        // Aquí puedes añadir lógica de validación antes de guardar
+
         if (miembroRepository.findByDni(miembro.getDni()).isPresent()) {
             throw new IllegalArgumentException("Ya existe un miembro con este DNI.");
         }
         if (miembroRepository.findByEmail(miembro.getEmail()).isPresent()) {
             throw new IllegalArgumentException("Ya existe un miembro con este email.");
         }
-        // Asignar fecha de registro y establecer como activo por defecto
-        miembro.setFechaRegistro(LocalDateTime.now());
-        if (miembro.getActivo() == null) { // Para evitar sobrescribir si ya viene con un valor
+
+
+        if (miembro.getFechaRegistro() == null) {
+            miembro.setFechaRegistro(LocalDateTime.now());
+        }
+
+        if (miembro.getActivo() == null) {
             miembro.setActivo(true);
         }
-        // NOTA: La contraseña DEBE ser encriptada antes de guardarla en un entorno real.
-        // Esto lo haremos cuando configuremos Spring Security para la encriptación.
+
+
+        if (miembro.getPassword() == null || miembro.getPassword().isEmpty()) {
+            throw new IllegalArgumentException("La contraseña es obligatoria para el nuevo miembro.");
+        }
+
+        miembro.setPassword(passwordEncoder.encode(miembro.getPassword()));
+
         return miembroRepository.save(miembro);
     }
 
-    @Transactional(readOnly = true) // readOnly=true optimiza para solo lectura
+    @Transactional(readOnly = true)
     public Optional<Miembro> obtenerMiembroPorId(Long id) {
         return miembroRepository.findById(id);
     }
@@ -65,25 +74,43 @@ public class MiembroService {
 
     @Transactional
     public Miembro actualizarMiembro(Miembro miembroActualizado) {
-        // Lógica para actualizar un miembro existente
-        if (miembroActualizado.getId() == null || !miembroRepository.existsById(miembroActualizado.getId())) {
-            throw new IllegalArgumentException("El miembro a actualizar no existe o no tiene un ID válido.");
-        }
-        // Podrías cargar el miembro existente, copiar los datos actualizados y guardar
-        Miembro existente = miembroRepository.findById(miembroActualizado.getId())
-                .orElseThrow(() -> new IllegalArgumentException("Miembro no encontrado para actualización."));
 
-        // Actualiza solo los campos permitidos o relevantes para la actualización
+        if (miembroActualizado.getId() == null) {
+            throw new IllegalArgumentException("El ID del miembro a actualizar no puede ser nulo.");
+        }
+
+        Miembro existente = miembroRepository.findById(miembroActualizado.getId())
+                .orElseThrow(() -> new IllegalArgumentException("Miembro no encontrado con ID: " + miembroActualizado.getId()));
+
+
         existente.setNombre(miembroActualizado.getNombre());
         existente.setApellido(miembroActualizado.getApellido());
         existente.setEmail(miembroActualizado.getEmail());
         existente.setTelefono(miembroActualizado.getTelefono());
         existente.setFechaNacimiento(miembroActualizado.getFechaNacimiento());
         existente.setSexo(miembroActualizado.getSexo());
-        // No actualizamos DNI ni FechaRegistro en una actualización estándar,
-        // pero la contraseña sí debería tener su propio método de actualización.
+
+        if (miembroActualizado.getActivo() != null) {
+            existente.setActivo(miembroActualizado.getActivo());
+        }
+
+
+        if (miembroActualizado.getPassword() != null && !miembroActualizado.getPassword().isEmpty()) {
+            existente.setPassword(passwordEncoder.encode(miembroActualizado.getPassword()));
+        }
 
         return miembroRepository.save(existente);
+    }
+
+    @Transactional
+    public Miembro actualizarPasswordMiembro(Long id, String nuevaPassword) {
+        Miembro miembro = miembroRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Miembro no encontrado con ID: " + id));
+        if (nuevaPassword == null || nuevaPassword.isEmpty()) {
+            throw new IllegalArgumentException("La nueva contraseña no puede ser nula o vacía.");
+        }
+        miembro.setPassword(passwordEncoder.encode(nuevaPassword));
+        return miembroRepository.save(miembro);
     }
 
     @Transactional
