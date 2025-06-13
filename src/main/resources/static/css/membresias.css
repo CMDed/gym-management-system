@@ -1,0 +1,58 @@
+.memberships-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 20px;
+    padding: 20px 0;
+}
+.membership-card {
+    background-color: white;
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+.membership-card h3 {
+    font-size: 1.8rem;
+    color: #007bff;
+    margin-bottom: 15px;
+}
+.membership-card .price {
+    font-size: 2.2rem;
+    font-weight: bold;
+    color: #28a745;
+    margin-bottom: 20px;
+}
+.membership-card ul {
+    list-style: none;
+    padding: 0;
+    margin-bottom: 25px;
+    text-align: left;
+}
+.membership-card ul li {
+    margin-bottom: 10px;
+    padding-left: 20px;
+    position: relative;
+}
+.membership-card ul li::before {
+    content: '✔';
+    color: #28a745;
+    position: absolute;
+    left: 0;
+}
+.button-secondary {
+    background-color: #007bff;
+    color: white;
+    padding: 10px 20px;
+    text-decoration: none;
+    border-radius: 5px;
+    font-size: 1rem;
+    transition: background-color 0.3s ease;
+    display: inline-block;
+    margin-top: auto;
+}
+.button-secondary:hover {
+    background-color: #0056b3;
+}

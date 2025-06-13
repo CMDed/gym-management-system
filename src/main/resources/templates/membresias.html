@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Nuestras Membresías - SystemGym</title>
+  <link rel="stylesheet" th:href="@{/css/styles.css}">
+  <link rel="stylesheet" th:href="@{/css/membresias.css}">
+</head>
+<body>
+<header>
+  <nav>
+    <a th:href="@{/}" class="logo">SystemGym</a>
+    <ul>
+      <li><a th:href="@{/}">Inicio</a></li>
+      <li><a th:href="@{/membresias}">Membresías</a></li>
+      <li><a th:href="@{/registro-miembro}">Regístrate</a></li>
+      <li><a th:href="@{/login}">Iniciar Sesión</a></li>
+    </ul>
+  </nav>
+</header>
+
+<main>
+  <section class="hero">
+    <h1>Descubre tu plan ideal</h1>
+    <p>Elige la membresía que mejor se adapte a tus objetivos y empieza tu viaje fitness hoy mismo.</p>
+  </section>
+
+  <section>
+    <h2>Planes de Membresía</h2>
+    <div id="memberships-grid" class="memberships-grid">
+      <p id="loading-message">Cargando membresías...</p>
+      <p id="error-message" class="error-message" style="display:none;">
+        No se pudieron cargar las membresías. Por favor, intenta de nuevo más tarde.
+      </p>
+      <p id="no-memberships-message" style="display:none;">
+        No hay membresías disponibles en este momento.
+      </p>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <p>&copy; 2025 SystemGym. Todos los derechos reservados.</p>
+</footer>
+
+<script th:src="@{/js/membresias.js}"></script>
+</body>
+</html>

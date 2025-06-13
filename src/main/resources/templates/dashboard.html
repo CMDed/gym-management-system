@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Panel de Control - SystemGym</title>
+  <link rel="stylesheet" th:href="@{/css/styles.css}">
+  <link rel="stylesheet" th:href="@{/css/form.css}">
+  <style>
+    /* Tus estilos CSS aquí (los que ya tenías) */
+    .info-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 15px;
+        margin-top: 20px;
+    }
+    .info-item label {
+        font-weight: bold;
+        display: block;
+        margin-bottom: 5px;
+        color: #555;
+    }
+    .info-item span {
+        display: block;
+        padding: 8px 10px;
+        background-color: #f9f9f9;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+    }
+  </style>
+</head>
+<body>
+<header>
+  <nav>
+    <a th:href="@{/}" class="logo">SystemGym</a>
+    <ul>
+      <li><a th:href="@{/}">Inicio</a></li>
+      <li><a th:href="@{/membresias}">Membresías</a></li>
+      <li sec:authorize="isAuthenticated()"><a th:href="@{/dashboard}">Mi Perfil</a></li>
+      <li sec:authorize="!isAuthenticated()"><a th:href="@{/registro-miembro}">Regístrate</a></li>
+      <li sec:authorize="!isAuthenticated()"><a th:href="@{/login}">Iniciar Sesión</a></li>
+      <li sec:authorize="isAuthenticated()">
+        <form th:action="@{/logout}" method="post" style="display:inline;">
+          <button type="submit" class="nav-button">Cerrar Sesión</button>
+        </form>
+      </li>
+    </ul>
+  </nav>
+</header>
+
+<main class="form-container">
+  <section class="form-card">
+    <div th:with="miembroPrincipal=${#authentication.getPrincipal()}">
+      <h2>Bienvenido a tu Panel de Control,
+        <span th:text="${miembroPrincipal.getNombre() != null ? miembroPrincipal.getNombre() : ''}"></span>
+        <span th:text="${miembroPrincipal.getApellido() != null ? miembroPrincipal.getApellido() : ''}"></span>!
+      </h2>
+      <p>Aquí puedes ver y gestionar tu información y membresías.</p>
+
+      <h3>Tus Datos Personales</h3>
+      <div class="info-grid">
+        <div class="info-item">
+          <label>Tipo de Identificación:</label>
+          <span th:text="${miembroPrincipal.getTipoIdentificacion() != null ? miembroPrincipal.getTipoIdentificacion() : 'N/A'}"></span>
+        </div>
+        <div class="info-item">
+          <label>Número de Identificación (DNI):</label>
+          <span th:text="${miembroPrincipal.getNumeroIdentificacion() != null ? miembroPrincipal.getNumeroIdentificacion() : 'N/A'}"></span>
+        </div>
+        <div class="info-item">
+          <label>Nombre Completo:</label>
+          <span th:text="${(miembroPrincipal.getNombre() != null ? miembroPrincipal.getNombre() : '') + ' ' + (miembroPrincipal.getApellido() != null ? miembroPrincipal.getApellido() : '')}"></span>
+        </div>
+        <div class="info-item">
+          <label>Fecha de Nacimiento:</label>
+          <span th:text="${miembroPrincipal.getFechaNacimiento() != null ? #temporals.format(miembroPrincipal.getFechaNacimiento(), 'dd-MM-yyyy') : 'N/A'}"></span>
+        </div>
+        <div class="info-item">
+          <label>Género:</label>
+          <span th:text="${miembroPrincipal.getSexo() != null ? miembroPrincipal.getSexo().toString() : 'N/A'}"></span>
+        </div>
+        <div class="info-item">
+          <label>Teléfono:</label>
+          <span th:text="${miembroPrincipal.getTelefono() != null ? miembroPrincipal.getTelefono() : 'N/A'}"></span>
+        </div>
+        <div class="info-item">
+          <label>Correo Electrónico:</label>
+          <span th:text="${miembroPrincipal.getCorreo() != null ? miembroPrincipal.getCorreo() : 'N/A'}"></span>
+        </div>
+      </div>
+    </div>
+
+    <h3 style="margin-top: 30px;">Tu Información de Membresía Actual</h3>
+    <div id="member-memberships">
+      <div th:if="${inscripcionMembresia != null}">
+        <div class="info-grid">
+          <div class="info-item">
+            <label>Plan de Membresía:</label>
+            <span th:text="${inscripcionMembresia.getMembresia().getNombrePlan() != null ? inscripcionMembresia.getMembresia().getNombrePlan() : 'N/A'}"></span>
+          </div>
+          <div class="info-item">
+            <label>Precio Pagado:</label>
+            <span th:text="${inscripcionMembresia.getPrecioPagado() != null ? #numbers.formatCurrency(inscripcionMembresia.getPrecioPagado()) : 'N/A'}"></span>
+          </div>
+          <div class="info-item">
+            <label>Duración del Plan:</label>
+            <span th:text="${inscripcionMembresia.getMembresia().getDuracionDias() != null ? inscripcionMembresia.getMembresia().getDuracionDias() + ' días' : 'N/A'}"></span>
+          </div>
+          <div class="info-item">
+            <label>Fecha de Inicio:</label>
+            <span th:text="${inscripcionMembresia.getFechaInicio() != null ? #temporals.format(inscripcionMembresia.getFechaInicio(), 'dd-MM-yyyy') : 'N/A'}"></span>
+          </div>
+          <div class="info-item">
+            <label>Fecha de Fin:</label>
+            <span th:text="${inscripcionMembresia.getFechaFin() != null ? #temporals.format(inscripcionMembresia.getFechaFin(), 'dd-MM-yyyy') : 'N/A'}"></span>
+          </div>
+          <div class="info-item" style="grid-column: span 2;">
+            <label>Descripción del Plan:</label>
+            <span th:text="${inscripcionMembresia.getMembresia().getDescripcion() != null ? inscripcionMembresia.getMembresia().getDescripcion() : 'N/A'}"></span>
+          </div>
+          <div class="info-item">
+            <label>Estado de la Inscripción:</label>
+            <span th:text="${inscripcionMembresia.getEstado() != null ? inscripcionMembresia.getEstado() : 'N/A'}"></span>
+          </div>
+          <div class="info-item">
+            <label>Fecha de Creación:</label>
+            <span th:text="${inscripcionMembresia.getFechaCreacion() != null ? #temporals.format(inscripcionMembresia.getFechaCreacion(), 'dd-MM-yyyy HH:mm') : 'N/A'}"></span>
+          </div>
+        </div>
+      </div>
+      <div th:unless="${inscripcionMembresia != null}">
+        <p>Actualmente no tienes una membresía activa registrada.</p>
+        <p>¡Explora nuestras <a th:href="@{/membresias}">opciones de membresía</a> para encontrar el plan perfecto para ti!</p>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <p>&copy; 2025 SystemGym. Todos los derechos reservados.</p>
+</footer>
+</body>
+</html>

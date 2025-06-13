@@ -2,10 +2,12 @@ package com.gimnasio.systemgym.controller;
 
 import com.gimnasio.systemgym.model.Pago;
 import com.gimnasio.systemgym.service.PagoService;
+import com.gimnasio.systemgym.dto.PagoDTO; // ¡NUEVO IMPORT!
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import jakarta.validation.Valid; // Para validar el DTO
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -22,21 +24,25 @@ public class PagoController {
         this.pagoService = pagoService;
     }
 
-    @PostMapping
-    public ResponseEntity<?> registrarPago(
-            @RequestParam Long miembroId,
-            @RequestParam Long inscripcionId,
-            @RequestParam BigDecimal monto,
-            @RequestParam String metodoPago,
-            @RequestParam(required = false) String referenciaTransaccion,
-            @RequestParam String estado) {
+    // Endpoint para registrar pago: cambiar a @RequestBody PagoDTO y ajustar el path
+    @PostMapping("/procesar") // Coincide con el fetch en pago.js
+    public ResponseEntity<?> procesarPago(@Valid @RequestBody PagoDTO pagoDTO) { // Espera un PagoDTO del cuerpo de la petición
         try {
-            Pago nuevoPago = pagoService.registrarPago(miembroId, inscripcionId, monto, metodoPago, referenciaTransaccion, estado);
+            // Llama al servicio con los datos del DTO
+            Pago nuevoPago = pagoService.registrarPago(
+                    pagoDTO.getMiembroId(),
+                    pagoDTO.getInscripcionMembresiaId(), // Usar el campo correcto del DTO
+                    pagoDTO.getMonto(),
+                    pagoDTO.getMetodoPago(),
+                    pagoDTO.getReferenciaTransaccion(),
+                    pagoDTO.getEstado()
+            );
             return new ResponseEntity<>(nuevoPago, HttpStatus.CREATED);
         } catch (IllegalArgumentException e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         } catch (Exception e) {
-            return new ResponseEntity<>("Error interno del servidor al registrar pago: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+            e.printStackTrace(); // Imprimir el stack trace para depuración
+            return new ResponseEntity<>("Error interno del servidor al procesar pago: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 

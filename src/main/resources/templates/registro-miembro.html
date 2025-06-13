@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Regístrate - SystemGym</title>
+  <link rel="stylesheet" th:href="@{/css/styles.css}">
+  <link rel="stylesheet" th:href="@{/css/form.css}">
+</head>
+<body>
+<header>
+  <nav>
+    <a th:href="@{/}" class="logo">SystemGym</a>
+    <ul>
+      <li><a th:href="@{/}">Inicio</a></li>
+      <li><a th:href="@{/membresias}">Membresías</a></li>
+      <li><a th:href="@{/registro-miembro}">Regístrate</a></li>
+      <li><a th:href="@{/login}">Iniciar Sesión</a></li>
+    </ul>
+  </nav>
+</header>
+
+<main class="form-container">
+  <section class="form-card">
+    <h2>Regístrate como Miembro</h2>
+    <p th:if="${selectedMembershipType}">Estás registrándote para la membresía: <strong th:text="${selectedMembershipType}"></strong>.</p>
+    <p th:unless="${selectedMembershipType}">Por favor, completa tus datos para registrarte.</p>
+
+    <input type="hidden" id="selectedMembershipId" th:value="${selectedMembershipId}" th:if="${selectedMembershipId}">
+
+
+    <form id="registroMiembroForm">
+      <div class="form-group">
+        <label for="tipoIdentificacion">Tipo de Identificación:</label>
+        <select id="tipoIdentificacion" name="tipoIdentificacion" required>
+          <option value="">Seleccione</option>
+          <option value="DNI">DNI</option>
+          <option value="CE">Carnet de Extranjería</option>
+          <option value="PASAPORTE">Pasaporte</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="numeroIdentificacion">Número de Identificación:</label>
+        <input type="text" id="numeroIdentificacion" name="numeroIdentificacion" required
+               pattern="[0-9]+" title="Solo números permitidos." minlength="6" maxlength="20">
+      </div>
+
+      <div class="form-group">
+        <label for="nombre">Nombre:</label>
+        <input type="text" id="nombre" name="nombre" required maxlength="100">
+      </div>
+
+      <div class="form-group">
+        <label for="apellido">Apellido:</label>
+        <input type="text" id="apellido" name="apellido" required maxlength="100">
+      </div>
+
+      <div class="form-group">
+        <label for="correo">Correo Electrónico:</label>
+        <input type="email" id="correo" name="correo" required maxlength="150">
+      </div>
+
+      <div class="form-group">
+        <label for="telefono">Teléfono (opcional):</label>
+        <input type="text" id="telefono" name="telefono" pattern="[0-9]{9}" title="Debe ser un número de 9 dígitos." maxlength="20">
+      </div>
+
+      <div class="form-group">
+        <label for="sexo">Sexo:</label>
+        <select id="sexo" name="sexo" required>
+          <option value="">Seleccione</option>
+          <option value="MASCULINO">Masculino</option>
+          <option value="FEMENINO">Femenino</option>
+          <option value="OTRO">Otro</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="fechaNacimiento">Fecha de Nacimiento:</label>
+        <input type="date" id="fechaNacimiento" name="fechaNacimiento" required>
+      </div>
+
+      <div class="form-group">
+        <label for="contrasena">Contraseña:</label>
+        <input type="password" id="contrasena" name="contrasena" required minlength="6">
+      </div>
+
+      <div class="form-group">
+        <label for="confirmarContrasena">Confirmar Contraseña:</label>
+        <input type="password" id="confirmarContrasena" name="confirmarContrasena" required minlength="6">
+        <p id="passwordMatchError" class="error-message" style="display: none;">Las contraseñas no coinciden.</p>
+      </div>
+
+      <p id="registrationSuccessMessage" class="success-message" style="display: none;"></p>
+      <p id="registrationErrorMessage" class="error-message" style="display: none;"></p>
+
+      <button type="submit" class="button-primary">Registrarse</button>
+    </form>
+  </section>
+</main>
+
+<footer>
+  <p>&copy; 2025 SystemGym. Todos los derechos reservados.</p>
+</footer>
+
+<script th:src="@{/js/registro-miembro.js}"></script>
+</body>
+</html>
