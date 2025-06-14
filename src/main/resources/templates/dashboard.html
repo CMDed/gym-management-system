@@ -7,7 +7,6 @@
   <link rel="stylesheet" th:href="@{/css/styles.css}">
   <link rel="stylesheet" th:href="@{/css/form.css}">
   <style>
-    /* Tus estilos CSS aquí (los que ya tenías) */
     .info-grid {
         display: grid;
         grid-template-columns: 1fr 1fr;
@@ -133,9 +132,30 @@
         <p>¡Explora nuestras <a th:href="@{/membresias}">opciones de membresía</a> para encontrar el plan perfecto para ti!</p>
       </div>
     </div>
+    <div th:if="${membresiaPendiente != null}" style="margin-top: 40px; padding: 20px; background-color: #fff3cd; border: 1px solid #ffeeba; border-radius: 8px; text-align: center;">
+      <h2>¡Atención! Tienes un Pago Pendiente</h2>
+      <p>Hay una membresía de plan <strong th:text="${membresiaPendiente.getMembresia().getNombrePlan()}"></strong> esperando ser activada.</p>
+      <p>Monto a pagar: <strong th:text="${#numbers.formatCurrency(membresiaPendiente.getMembresia().getPrecio())}"></strong></p>
+
+      <a th:href="@{'/pago?miembroId=' + ${miembroPrincipal.miembro.getId()} + '&inscripcionMembresiaId=' + ${membresiaPendiente.getId()}}">
+        <button style="
+        background-color: #007bff; /* Color azul para el botón */
+        color: white;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 1em;
+        margin-top: 15px;
+        transition: background-color 0.3s ease;
+    ">Completar Pago Ahora</button>
+      </a>
+      <p style="margin-top: 10px; font-size: 0.9em; color: #856404;">
+        Tu membresía no estará activa hasta que se complete este pago.
+      </p>
+    </div>
   </section>
 </main>
-
 <footer>
   <p>&copy; 2025 SystemGym. Todos los derechos reservados.</p>
 </footer>

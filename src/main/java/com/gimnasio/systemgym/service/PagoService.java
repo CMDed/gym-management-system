@@ -4,6 +4,8 @@ import com.gimnasio.systemgym.model.Pago;
 import com.gimnasio.systemgym.model.Miembro;
 import com.gimnasio.systemgym.model.InscripcionMembresia;
 import com.gimnasio.systemgym.repository.PagoRepository;
+import com.gimnasio.systemgym.service.MiembroService;
+import com.gimnasio.systemgym.service.InscripcionMembresiaService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -35,6 +37,7 @@ public class PagoService {
         InscripcionMembresia inscripcion = inscripcionMembresiaService.obtenerInscripcionPorId(inscripcionId)
                 .orElseThrow(() -> new IllegalArgumentException("Inscripción de membresía no encontrada."));
 
+
         Pago pago = new Pago();
         pago.setMiembro(miembro);
         pago.setInscripcionMembresia(inscripcion);
@@ -44,8 +47,13 @@ public class PagoService {
         pago.setReferenciaTransaccion(referenciaTransaccion);
         pago.setEstado(estado);
 
-        return pagoRepository.save(pago);
+        Pago nuevoPago = pagoRepository.save(pago);
+
+        inscripcionMembresiaService.completarPagoInscripcion(inscripcionId, monto);
+
+        return nuevoPago;
     }
+
 
     @Transactional
     public void eliminarPago(Long id) {

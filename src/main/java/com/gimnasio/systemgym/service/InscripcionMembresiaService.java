@@ -30,7 +30,7 @@ public class InscripcionMembresiaService {
         this.membresiaService = membresiaService;
     }
 
-    // --- NUEVO MÉTODO PARA CREAR LA INSCRIPCIÓN INICIAL CON ESTADO PENDIENTE_PAGO ---
+
     @Transactional
     public InscripcionMembresia crearInscripcionInicial(Long miembroId, Long membresiaId) {
         Miembro miembro = miembroService.obtenerMiembroPorId(miembroId)
@@ -46,15 +46,14 @@ public class InscripcionMembresiaService {
         inscripcion.setMembresia(membresia);
         inscripcion.setFechaInicio(fechaInicio);
         inscripcion.setFechaFin(fechaFin);
-        inscripcion.setPrecioPagado(BigDecimal.ZERO); // Inicialmente 0, se actualizará al procesar el pago
-        inscripcion.setEstado("PENDIENTE_PAGO"); // <-- ¡ESTADO INICIAL CRÍTICO!
+        inscripcion.setPrecioPagado(BigDecimal.ZERO);
+        inscripcion.setEstado("PENDIENTE_PAGO");
         inscripcion.setFechaCreacion(LocalDateTime.now());
 
         return inscripcionMembresiaRepository.save(inscripcion);
     }
 
 
-    // El método 'crearInscripcion' existente, que es más para uso administrativo si el precio se conoce de antemano
     @Transactional
     public InscripcionMembresia crearInscripcion(Long miembroId, Long membresiaId, BigDecimal precioPagado) {
         Miembro miembro = miembroService.obtenerMiembroPorId(miembroId)
@@ -71,7 +70,7 @@ public class InscripcionMembresiaService {
         inscripcion.setFechaInicio(fechaInicio);
         inscripcion.setFechaFin(fechaFin);
         inscripcion.setPrecioPagado(precioPagado);
-        inscripcion.setEstado("ACTIVA"); // Este método asume que ya se pagó
+        inscripcion.setEstado("ACTIVA");
         inscripcion.setFechaCreacion(LocalDateTime.now());
 
         return inscripcionMembresiaRepository.save(inscripcion);
@@ -110,15 +109,15 @@ public class InscripcionMembresiaService {
         return inscripcionMembresiaRepository.save(inscripcion);
     }
 
-    // --- NUEVO MÉTODO para actualizar precio pagado y estado a ACTIVA ---
+
     @Transactional
     public InscripcionMembresia completarPagoInscripcion(Long inscripcionId, BigDecimal montoPagado) {
         InscripcionMembresia inscripcion = inscripcionMembresiaRepository.findById(inscripcionId)
                 .orElseThrow(() -> new IllegalArgumentException("Inscripción de membresía no encontrada."));
 
         inscripcion.setPrecioPagado(montoPagado);
-        inscripcion.setEstado("ACTIVA"); // Cambia el estado a ACTIVA
-        // Puedes añadir una fecha de activación o similar si es necesario
+        inscripcion.setEstado("ACTIVA");
+
 
         return inscripcionMembresiaRepository.save(inscripcion);
     }
@@ -136,4 +135,24 @@ public class InscripcionMembresiaService {
             }
         }
     }
+
+    @Transactional(readOnly = true)
+    public Optional<InscripcionMembresia> obtenerMembresiaActivaPorMiembro(Long miembroId) {
+        Miembro miembro = miembroService.obtenerMiembroPorId(miembroId)
+                .orElseThrow(() -> new IllegalArgumentException("Miembro no encontrado."));
+
+        return inscripcionMembresiaRepository.findTopByMiembroAndEstadoOrderByFechaFinDesc(miembro, "ACTIVA");
+    }
+
+    // --- MÉTODO PARA OBTENER LA INSCRIPCIÓN PENDIENTE DE PAGO ---
+    @Transactional(readOnly = true)
+    public Optional<InscripcionMembresia> obtenerInscripcionPendientePorMiembro(Long miembroId) {
+        Miembro miembro = miembroService.obtenerMiembroPorId(miembroId)
+                .orElseThrow(() -> new IllegalArgumentException("Miembro no encontrado."));
+
+        return inscripcionMembresiaRepository.findTopByMiembroAndEstadoOrderByFechaCreacionDesc(miembro, "PENDIENTE_PAGO");
+
+    }
+
+
 }

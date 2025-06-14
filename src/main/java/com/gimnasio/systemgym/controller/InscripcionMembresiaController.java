@@ -22,22 +22,54 @@ public class InscripcionMembresiaController {
         this.inscripcionMembresiaService = inscripcionMembresiaService;
     }
 
-    @PostMapping
-    public ResponseEntity<?> crearInscripcion(
+
+    @PostMapping("/iniciar")
+    public ResponseEntity<?> iniciarNuevaInscripcion(
             @RequestParam Long miembroId,
-            @RequestParam Long membresiaId,
-            @RequestParam BigDecimal precioPagado) {
+            @RequestParam Long membresiaId) {
+        try {
+            InscripcionMembresia nuevaInscripcion = inscripcionMembresiaService.crearInscripcionInicial(miembroId, membresiaId);
+            return new ResponseEntity<>(nuevaInscripcion, HttpStatus.CREATED);
+        } catch (IllegalArgumentException e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        } catch (Exception e) {
+            return new ResponseEntity<>("Error al iniciar la inscripción: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+
+
+    @PutMapping("/{id}/completar-pago")
+    public ResponseEntity<?> completarPagoInscripcion(
+            @PathVariable Long id,
+            @RequestParam BigDecimal montoPagado) {
+        try {
+            InscripcionMembresia inscripcionActualizada = inscripcionMembresiaService.completarPagoInscripcion(id, montoPagado);
+            return new ResponseEntity<>(inscripcionActualizada, HttpStatus.OK);
+        } catch (IllegalArgumentException e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        } catch (Exception e) {
+            return new ResponseEntity<>("Error al completar el pago de la inscripción: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+
+    @PostMapping("/directa")
+    public ResponseEntity<?> crearInscripcionDirecta(
+                                                      @RequestParam Long miembroId,
+                                                      @RequestParam Long membresiaId,
+                                                      @RequestParam BigDecimal precioPagado) {
         try {
             InscripcionMembresia nuevaInscripcion = inscripcionMembresiaService.crearInscripcion(miembroId, membresiaId, precioPagado);
             return new ResponseEntity<>(nuevaInscripcion, HttpStatus.CREATED);
         } catch (IllegalArgumentException e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         } catch (Exception e) {
-            return new ResponseEntity<>("Error interno del servidor al crear inscripción: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>("Error interno del servidor al crear inscripción directa: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
-    //End point para obtener inscripcion por ID
+
     @GetMapping("/{id}")
     public ResponseEntity<?> obtenerInscripcionPorId(@PathVariable Long id) {
         Optional<InscripcionMembresia> inscripcion = inscripcionMembresiaService.obtenerInscripcionPorId(id);
@@ -47,7 +79,6 @@ public class InscripcionMembresiaController {
             return new ResponseEntity<>("Inscripción no encontrada", HttpStatus.NOT_FOUND);
         }
     }
-    //
 
     @GetMapping
     public ResponseEntity<List<InscripcionMembresia>> obtenerTodasLasInscripciones() {
