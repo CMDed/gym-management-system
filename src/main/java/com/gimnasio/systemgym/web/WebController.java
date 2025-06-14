@@ -22,9 +22,8 @@ public class WebController {
     public String showRegistroMiembroPage(@RequestParam(name = "membershipId", required = false) Long membershipId,
                                           @RequestParam(name = "membershipType", required = false) String membershipType,
                                           Model model) {
-        // Pasa los parámetros de la URL al modelo para que Thymeleaf pueda usarlos
         if (membershipId != null) {
-            model.addAttribute("selectedMembershipId", membershipId); // <--- ¡AQUÍ SE AÑADE AL MODELO!
+            model.addAttribute("selectedMembershipId", membershipId);
         }
         if (membershipType != null) {
             model.addAttribute("selectedMembershipType", membershipType);
@@ -33,11 +32,11 @@ public class WebController {
     }
 
     @GetMapping("/pago")
-    public String showPagoPage(@RequestParam(name = "miembroId") Long miembroId, // Obligatorio
-                               @RequestParam(name = "inscripcionMembresiaId") Long inscripcionMembresiaId, // <-- ¡CAMBIO AQUÍ!
+    public String showPagoPage(@RequestParam(name = "miembroId") Long miembroId,
+                               @RequestParam(name = "inscripcionMembresiaId") Long inscripcionMembresiaId,
                                Model model) {
         model.addAttribute("miembroId", miembroId);
-        model.addAttribute("inscripcionMembresiaId", inscripcionMembresiaId); // <-- ¡CAMBIO AQUÍ!
+        model.addAttribute("inscripcionMembresiaId", inscripcionMembresiaId);
         return "pago";
     }
 
@@ -48,6 +47,6 @@ public class WebController {
 
     @GetMapping("/old-dashboard")
     public String showDashboardPage() {
-        return "old-dashboard"; // Retorna la vista dashboard.html
+        return "old-dashboard";
     }
 }

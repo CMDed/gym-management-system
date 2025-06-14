@@ -21,12 +21,11 @@ public class MembresiaService {
 
     @Transactional
     public Membresia crearMembresia(Membresia membresia) {
-        // Aquí podrías añadir validaciones, por ejemplo, que el nombre del plan sea único
         if (membresiaRepository.findByNombrePlan(membresia.getNombrePlan()).isPresent()) {
             throw new IllegalArgumentException("Ya existe una membresía con este nombre de plan.");
         }
         if (membresia.getActivo() == null) {
-            membresia.setActivo(true); // Activa por defecto al crear
+            membresia.setActivo(true);
         }
         return membresiaRepository.save(membresia);
     }
@@ -56,7 +55,7 @@ public class MembresiaService {
         if (membresiaActualizada.getId() == null || !membresiaRepository.existsById(membresiaActualizada.getId())) {
             throw new IllegalArgumentException("La membresía a actualizar no existe o no tiene un ID válido.");
         }
-        // Lógica de actualización (por ejemplo, cargar la existente y actualizar campos específicos)
+
         Membresia existente = membresiaRepository.findById(membresiaActualizada.getId())
                 .orElseThrow(() -> new IllegalArgumentException("Membresía no encontrada para actualización."));
 

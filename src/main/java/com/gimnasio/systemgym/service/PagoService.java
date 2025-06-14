@@ -29,7 +29,7 @@ public class PagoService {
         this.miembroService = miembroService;
         this.inscripcionMembresiaService = inscripcionMembresiaService;
     }
-
+    
     @Transactional
     public Pago registrarPago(Long miembroId, Long inscripcionId, BigDecimal monto, String metodoPago, String referenciaTransaccion, String estado) {
         Miembro miembro = miembroService.obtenerMiembroPorId(miembroId)

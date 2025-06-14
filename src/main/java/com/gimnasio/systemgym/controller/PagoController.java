@@ -2,12 +2,12 @@ package com.gimnasio.systemgym.controller;
 
 import com.gimnasio.systemgym.model.Pago;
 import com.gimnasio.systemgym.service.PagoService;
-import com.gimnasio.systemgym.dto.PagoDTO; // ¡NUEVO IMPORT!
+import com.gimnasio.systemgym.dto.PagoDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import jakarta.validation.Valid; // Para validar el DTO
+import jakarta.validation.Valid;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -24,14 +24,12 @@ public class PagoController {
         this.pagoService = pagoService;
     }
 
-    // Endpoint para registrar pago: cambiar a @RequestBody PagoDTO y ajustar el path
     @PostMapping("/procesar") // Coincide con el fetch en pago.js
-    public ResponseEntity<?> procesarPago(@Valid @RequestBody PagoDTO pagoDTO) { // Espera un PagoDTO del cuerpo de la petición
+    public ResponseEntity<?> procesarPago(@Valid @RequestBody PagoDTO pagoDTO) {
         try {
-            // Llama al servicio con los datos del DTO
             Pago nuevoPago = pagoService.registrarPago(
                     pagoDTO.getMiembroId(),
-                    pagoDTO.getInscripcionMembresiaId(), // Usar el campo correcto del DTO
+                    pagoDTO.getInscripcionMembresiaId(),
                     pagoDTO.getMonto(),
                     pagoDTO.getMetodoPago(),
                     pagoDTO.getReferenciaTransaccion(),
@@ -41,12 +39,11 @@ public class PagoController {
         } catch (IllegalArgumentException e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         } catch (Exception e) {
-            e.printStackTrace(); // Imprimir el stack trace para depuración
+            e.printStackTrace();
             return new ResponseEntity<>("Error interno del servidor al procesar pago: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
-    //End point para obtener el pago por el ID
     @GetMapping("/{id}")
     public ResponseEntity<?> obtenerPagoPorId(@PathVariable Long id) {
         Optional<Pago> pago = pagoService.obtenerPagoPorId(id);

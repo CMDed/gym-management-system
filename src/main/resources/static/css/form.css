@@ -1,26 +1,99 @@
-.form-container {
-    max-width: 600px;
+.form-main-section {
+    max-width: 900px;
     margin: 40px auto;
-    padding: 30px;
-    background-color: white;
-    border-radius: 8px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-}
-.form-container h2 {
+    padding: 20px;
+    background-color: transparent;
     text-align: center;
-    color: #333;
+}
+
+.form-card {
+    background-color: #1a1a1a;
+    padding: 40px;
+    border-radius: 12px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.4);
+    color: #ccc;
+    animation: fadeIn 1s ease-out forwards;
+}
+
+.form-card h2 {
+    text-align: center;
+    color: #ffd500;
     margin-bottom: 30px;
-    font-size: 2rem;
+    font-size: 2.5rem;
+    text-transform: uppercase;
+    font-family: 'Anton', sans-serif;
+    letter-spacing: 1.5px;
 }
-.form-group {
+
+.form-card p {
+    color: #bbb;
     margin-bottom: 20px;
+    font-size: 1.1rem;
 }
+
+.form-card strong {
+    color: #d82c2c;
+}
+
+
+.monto-display {
+    font-size: 1.3rem;
+    color: #ffd500;
+    font-weight: bold;
+    margin-bottom: 25px;
+}
+.monto-display #montoPagarDisplay {
+    color: #d82c2c;
+    font-family: 'Anton', sans-serif;
+    font-size: 1.5rem;
+}
+
+
+.form-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 25px 40px;
+    margin-bottom: 30px;
+}
+
+@media (min-width: 768px) {
+    .form-grid {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    #contrasena,
+    #confirmarContrasena {
+        grid-column: span 2;
+    }
+}
+
+.form-grid-inline {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 20px;
+    margin-bottom: 25px;
+}
+
+@media (min-width: 500px) {
+    .form-grid-inline {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+
+
+.form-group {
+    margin-bottom: 25px;
+    text-align: left;
+}
+
 .form-group label {
     display: block;
-    margin-bottom: 8px;
+    margin-bottom: 10px;
     font-weight: bold;
-    color: #555;
+    color: #ffd500;
+    font-size: 1.1rem;
 }
+
 .form-group input[type="text"],
 .form-group input[type="email"],
 .form-group input[type="tel"],
@@ -28,40 +101,83 @@
 .form-group input[type="password"],
 .form-group select {
     width: 100%;
-    padding: 12px;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-    box-sizing: border-box; /* Asegura que el padding no aumente el ancho total */
-    font-size: 1rem;
+    padding: 15px;
+    border: 1px solid #444;
+    border-radius: 8px;
+    box-sizing: border-box;
+    font-size: 1.1rem;
+    background-color: #2a2a2a;
+    color: #fff;
+    transition: all 0.3s ease;
 }
+
 .form-group input:focus,
 .form-group select:focus {
-    border-color: #007bff;
+    border-color: #ffd500;
     outline: none;
-    box-shadow: 0 0 0 3px rgba(0,123,255,0.25);
+    box-shadow: 0 0 0 4px rgba(255, 213, 0, 0.3);
+    background-color: #333;
 }
+
 .error-message {
-    color: red;
-    font-size: 0.9em;
-    margin-top: 5px;
-}
-.success-message {
-    color: green;
-    font-size: 1em;
-    margin-top: 15px;
+    color: #d82c2c;
+    font-size: 0.95em;
+    margin-top: 8px;
+    font-weight: bold;
     text-align: center;
 }
-.button-primary {
-    width: 100%;
-    padding: 15px;
-    background-color: #28a745;
-    color: white;
-    border: none;
+.success-message {
+    color: #28a745;
+    font-size: 1.1em;
+    margin-top: 20px;
+    text-align: center;
+    background-color: rgba(40, 167, 69, 0.2);
+    padding: 10px;
     border-radius: 5px;
-    font-size: 1.2rem;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
 }
-.button-primary:hover {
-    background-color: #218838;
+
+.button-primary-form {
+    width: 100%;
+    padding: 18px;
+    background: linear-gradient(90deg, #ffd500, #d82c2c);
+    color: #000 !important;
+    border: none;
+    border-radius: 8px;
+    font-size: 1.4rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-top: 30px;
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
+}
+
+.button-primary-form:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 20px rgba(255, 213, 0, 0.4);
+    opacity: 0.9;
+}
+
+.link-registration {
+    text-align: center;
+    margin-top: 25px;
+    font-size: 1.1rem;
+    color: #bbb;
+}
+
+.link-registration a {
+    color: #ffd500;
+    text-decoration: none;
+    font-weight: bold;
+    transition: color 0.3s ease;
+}
+
+.link-registration a:hover {
+    color: #d82c2c;
+    text-decoration: underline;
+}
+
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
 }

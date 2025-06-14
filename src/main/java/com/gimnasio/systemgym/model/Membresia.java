@@ -5,7 +5,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
 
-import java.math.BigDecimal; // Para manejar precios con precisión
+import java.math.BigDecimal;
 
 @Entity
 @Table(name = "membresias")
@@ -19,18 +19,18 @@ public class Membresia {
     private Long id;
 
     @Column(name = "nombre_plan", unique = true, nullable = false, length = 100)
-    private String nombrePlan; // Ej. "Mensual", "Anual Premium"
+    private String nombrePlan;
 
-    @Column(name = "descripcion", columnDefinition = "TEXT") // TEXT para descripciones largas
+    @Column(name = "descripcion", columnDefinition = "TEXT")
     private String descripcion;
 
-    @Column(name = "precio", nullable = false, precision = 10, scale = 2) // Precision 10, 2 decimales
-    private BigDecimal precio; // Usamos BigDecimal para dinero, evita problemas de punto flotante
+    @Column(name = "precio", nullable = false, precision = 10, scale = 2)
+    private BigDecimal precio;
 
     @Column(name = "duracion_dias", nullable = false)
-    private Integer duracionDias; // Ej. 30, 90, 365
+    private Integer duracionDias;
 
     @Column(name = "activo", nullable = false)
-    private Boolean activo; // Si la membresía está disponible para compra
+    private Boolean activo;
 
 }

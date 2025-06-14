@@ -23,7 +23,6 @@ public class Pago {
     @JoinColumn(name = "id_miembro", nullable = false)
     private Miembro miembro;
 
-    // Un pago puede estar asociado a una inscripción específica
     @ManyToOne
     @JoinColumn(name = "id_inscripcion_membresia", nullable = false)
     private InscripcionMembresia inscripcionMembresia;
@@ -35,12 +34,12 @@ public class Pago {
     private LocalDateTime fechaPago;
 
     @Column(name = "metodo_pago", nullable = false, length = 50)
-    private String metodoPago; // Ej. "Tarjeta", "Efectivo", "Transferencia"
+    private String metodoPago;
 
     @Column(name = "referencia_transaccion", length = 100)
-    private String referenciaTransaccion; // Puede ser null
+    private String referenciaTransaccion;
 
     @Column(name = "estado", nullable = false, length = 50)
-    private String estado; // Ej. "COMPLETADO", "FALLIDO", "REEMBOLSADO"
+    private String estado;
 
 }

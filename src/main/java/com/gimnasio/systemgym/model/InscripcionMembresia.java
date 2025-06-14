@@ -7,7 +7,7 @@ import lombok.AllArgsConstructor;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.math.BigDecimal; // Para el precio pagado
+import java.math.BigDecimal;
 
 @Entity
 @Table(name = "inscripciones_membresia")
@@ -20,14 +20,12 @@ public class InscripcionMembresia {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // Relación con Miembro (Clave Foránea: id_miembro)
-    @ManyToOne // Muchas inscripciones para un Miembro
-    @JoinColumn(name = "id_miembro", nullable = false) // Columna de la FK en esta tabla
+    @ManyToOne
+    @JoinColumn(name = "id_miembro", nullable = false)
     private Miembro miembro;
 
-    // Relación con Membresia (Clave Foránea: id_membresia)
-    @ManyToOne // Muchas inscripciones para un tipo de Membresia
-    @JoinColumn(name = "id_membresia", nullable = false) // Columna de la FK en esta tabla
+    @ManyToOne
+    @JoinColumn(name = "id_membresia", nullable = false)
     private Membresia membresia;
 
     @Column(name = "fecha_inicio", nullable = false)
@@ -40,7 +38,7 @@ public class InscripcionMembresia {
     private BigDecimal precioPagado;
 
     @Column(name = "estado", nullable = false, length = 50)
-    private String estado; // Ej. "ACTIVA", "VENCIDA", "CANCELADA", "PENDIENTE"
+    private String estado;
 
     @Column(name = "fecha_creacion", nullable = false)
     private LocalDateTime fechaCreacion;

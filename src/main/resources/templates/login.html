@@ -4,51 +4,95 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Iniciar Sesión - SystemGym</title>
-    <link rel="stylesheet" th:href="@{/css/styles.css}">
+
+    <link rel="stylesheet" th:href="@{/css/nuevo-estilo.css}">
+    <link rel="icon" th:href="@{/images/logo.png}" type="image/png">
+    <link href="https://fonts.googleapis.com/css2?family=Anton&display=swap" rel="stylesheet">
+
     <link rel="stylesheet" th:href="@{/css/form.css}">
 </head>
 <body>
 <header>
+    <div class="logo-container">
+        <a th:href="@{/}">
+            <img th:src="@{/images/logo.png}" alt="Logo SystemGym">
+        </a>
+    </div>
     <nav>
-        <a th:href="@{/}" class="logo">SystemGym</a>
         <ul>
-            <li><a th:href="@{/}">Inicio</a></li>
-            <li><a th:href="@{/membresias}">Membresías</a></li>
-            <li><a th:href="@{/registro-miembro}">Regístrate</a></li>
-            <li><a th:href="@{/login}">Iniciar Sesión</a></li>
+            <li><a th:href="@{/}">INICIO</a></li>
+            <li><a th:href="@{/membresias}">PLANES</a></li>
+            <li><a th:href="@{/ubicacion}">UBICACIÓN</a></li>
+            <li>
+                <div class="icon-container">
+                    <a th:href="@{/login}">
+                        <img th:src="@{/images/usuario.png}" alt="Mi Perfil" id="icono-inicio-sesion">
+                    </a>
+                </div>
+            </li>
+
         </ul>
     </nav>
 </header>
 
-<main class="form-container">
-    <section class="form-card">
-        <h2>Iniciar Sesión</h2>
+<main class="form-main-section"> <section class="form-card"> <h2>Iniciar Sesión</h2>
 
-        <div th:if="${param.error}" class="error-message">
-            Número de Identificación o contraseña incorrectos.
+    <div th:if="${param.error}" class="error-message">
+        Número de Identificación o contraseña incorrectos.
+    </div>
+    <div th:if="${param.logout}" class="success-message">
+        Has cerrado sesión exitosamente.
+    </div>
+
+    <form th:action="@{/perform_login}" method="post">
+        <div class="form-group">
+            <label for="username">Número de Identificación:</label>
+            <input type="text" id="username" name="username" required autocomplete="username">
         </div>
-        <div th:if="${param.logout}" class="success-message">
-            Has cerrado sesión exitosamente.
+        <div class="form-group">
+            <label for="password">Contraseña:</label>
+            <input type="password" id="password" name="password" required autocomplete="current-password">
         </div>
+        <button type="submit" class="button-primary-form">Entrar</button> </form>
 
-        <form th:action="@{/perform_login}" method="post">
-            <div class="form-group">
-                <label for="username">Número de Identificación (DNI):</label>
-                <input type="text" id="username" name="username" required autocomplete="username">
-            </div>
-            <div class="form-group">
-                <label for="password">Contraseña:</label>
-                <input type="password" id="password" name="password" required autocomplete="current-password">
-            </div>
-            <button type="submit" class="button-primary">Entrar</button>
-        </form>
 
-        <p style="text-align: center; margin-top: 20px;">¿No tienes cuenta? <a th:href="@{/registro-miembro}">Regístrate aquí</a>.</p>
-    </section>
+</section>
 </main>
 
 <footer>
-    <p>&copy; 2025 SystemGym. Todos los derechos reservados.</p>
+    <div class="logo-footer">
+        <a th:href="@{/}">
+            <img th:src="@{/images/logo.png}" alt="Logo SystemGym"><br><br>
+        </a>
+    </div>
+
+    <div class="footer_container">
+        <div class="redes-sociales">
+            <strong>Redes Sociales:</strong><br><br>
+            <a href="#" target="_blank"><img th:src="@{/images/FB.png}" alt="Facebook" class="icono-red"></a>
+            <a href="https://www.instagram.com/aresfitness.peru/" target="_blank"><img th:src="@{/images/Insta.png}" alt="Instagram" class="icono-red"></a>
+            <a href="#" target="_blank"><img th:src="@{/images/Tiktok.png}" alt="Tiktok" class="icono-red"></a>
+            <a href="#" target="_blank"><img th:src="@{/images/X.png}" alt="X" class="icono-red"></a>
+            <br><br>
+            <strong>CONTÁCTANOS:</strong><br><br>
+            <a href="#" target="_blank"><img th:src="@{/images/WhatsApp.png}" alt="WhatsApp" style="width: 20px; vertical-align: middle;"></a><br><br>
+            <a href="#" target="_blank"><img th:src="@{/images/Gmail.png}" alt="Correo electrónico" style="width: 20px; vertical-align: middle;"></a>
+        </div>
+
+        <div class="footer-section">
+            <a href="#">TÉRMINOS Y CONDICIONES</a><br><br><br>
+            <a href="#">POLÍTICAS Y PRIVACIDAD</a><br><br><br>
+            <a href="#">QUEJAS Y RECLAMOS</a>
+        </div>
+
+        <div class="footer-section" style="text-align: center;">
+            <a href="#">SOPORTE TÉCNICO</a><br><br><br>
+            <a th:href="@{/}">SYSTEMGYM</a><br><br><br><br>
+            <img th:src="@{/images/LibroR.png}" alt="Libro de Reclamaciones" style="width: 150px;">
+        </div>
+    </div>
+
+    <p>© 2025 SystemGym. Todos los derechos reservados.</p>
 </footer>
 </body>
 </html>

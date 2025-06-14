@@ -45,7 +45,6 @@ public class UsuarioController {
         }
     }
 
-    //End point para obtener el usuario por su ID
     @GetMapping("/{id}")
     public ResponseEntity<?> obtenerUsuarioPorId(@PathVariable Long id) {
         Optional<Usuario> usuario = usuarioService.obtenerUsuarioPorId(id);
@@ -64,7 +63,7 @@ public class UsuarioController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<?> actualizarUsuario(@PathVariable Long id, @Valid @RequestBody UsuarioDTO usuarioDTO) { // <-- CAMBIO ESENCIAL AQUÍ
+    public ResponseEntity<?> actualizarUsuario(@PathVariable Long id, @Valid @RequestBody UsuarioDTO usuarioDTO) {
 
         if (usuarioDTO.getId() == null || !id.equals(usuarioDTO.getId())) {
             return new ResponseEntity<>("El ID en la URL no coincide con el ID del usuario en el cuerpo de la petición.", HttpStatus.BAD_REQUEST);

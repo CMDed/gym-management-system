@@ -144,7 +144,6 @@ public class InscripcionMembresiaService {
         return inscripcionMembresiaRepository.findTopByMiembroAndEstadoOrderByFechaFinDesc(miembro, "ACTIVA");
     }
 
-    // --- MÉTODO PARA OBTENER LA INSCRIPCIÓN PENDIENTE DE PAGO ---
     @Transactional(readOnly = true)
     public Optional<InscripcionMembresia> obtenerInscripcionPendientePorMiembro(Long miembroId) {
         Miembro miembro = miembroService.obtenerMiembroPorId(miembroId)

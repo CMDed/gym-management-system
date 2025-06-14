@@ -2,7 +2,7 @@ package com.gimnasio.systemgym.service;
 
 import com.gimnasio.systemgym.model.Miembro;
 import com.gimnasio.systemgym.repository.MiembroRepository;
-import com.gimnasio.systemgym.service.MiembroDetails; // <-- ¡IMPORTAR TU NUEVA CLASE!
+import com.gimnasio.systemgym.service.MiembroDetails;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -22,7 +22,6 @@ public class MiembroDetailsService implements UserDetailsService {
         Miembro miembro = miembroRepository.findByNumeroIdentificacion(numeroIdentificacion)
                 .orElseThrow(() -> new UsernameNotFoundException("Miembro no encontrado con número de identificación: " + numeroIdentificacion));
 
-        // --- ¡CAMBIO AQUÍ! Devuelve una instancia de tu MiembroDetails personalizado ---
         return new MiembroDetails(miembro);
     }
 }

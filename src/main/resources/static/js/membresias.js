@@ -26,11 +26,15 @@ document.addEventListener('DOMContentLoaded', () => {
                 return;
             }
 
-            membresias.forEach(membresia => {
+            membresias.forEach((membresia, index) => {
                 const card = document.createElement('div');
                 card.className = 'membership-card';
 
-                // *** CAMBIO CLAVE AQUÍ: usar membresia.nombrePlan ***
+                card.style.animationDelay = `${0.2 * index + 0.8}s`;
+                card.style.opacity = '0';
+                card.style.transform = 'translateY(30px)';
+
+
                 card.innerHTML = `
                     <h3>${membresia.nombrePlan}</h3>
                     <div class="price">${formatPrice(membresia.precio)} / ${membresia.duracionDias} días</div>

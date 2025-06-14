@@ -1,7 +1,7 @@
 document.addEventListener('DOMContentLoaded', () => {
     console.log("Admin Dashboard cargado.");
-    // Ejemplo de cómo cargar miembros desde tu API REST
-    fetch('/api/miembros') // Llama a tu endpoint REST
+
+    fetch('/api/miembros')
         .then(response => response.json())
         .then(data => {
             const miembrosListDiv = document.getElementById('miembros-list');

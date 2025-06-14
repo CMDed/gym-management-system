@@ -1,15 +1,14 @@
 document.addEventListener('DOMContentLoaded', async () => {
     const pagoForm = document.getElementById('pagoForm');
     const miembroId = document.getElementById('miembroId').value;
-    const inscripcionMembresiaId = document.getElementById('inscripcionMembresiaId').value; // <-- ¡AHORA ES EL ID DE INSCRIPCIÓN!
+    const inscripcionMembresiaId = document.getElementById('inscripcionMembresiaId').value;
 
     const pagoSuccessMessage = document.getElementById('pagoSuccessMessage');
     const pagoErrorMessage = document.getElementById('pagoErrorMessage');
-    const montoPagarDisplay = document.getElementById('montoPagarDisplay'); // Nuevo elemento para mostrar el monto
+    const montoPagarDisplay = document.getElementById('montoPagarDisplay');
 
-    let montoMembresia = 0; // Variable para almacenar el monto real
+    let montoMembresia = 0;
 
-    // --- Paso 1: Obtener los detalles de la inscripción de membresía para obtener el monto ---
     if (inscripcionMembresiaId) {
         try {
             const inscripcionResponse = await fetch(`/api/inscripciones/${inscripcionMembresiaId}`);
@@ -18,10 +17,9 @@ document.addEventListener('DOMContentLoaded', async () => {
             }
             const inscripcionData = await inscripcionResponse.json();
 
-            // Asegúrate de que tu entidad Membresia en el backend tiene 'precio'
             if (inscripcionData.membresia && inscripcionData.membresia.precio) {
                 montoMembresia = inscripcionData.membresia.precio;
-                montoPagarDisplay.textContent = `$${parseFloat(montoMembresia).toFixed(2)}`; // Muestra el monto
+                montoPagarDisplay.textContent = `S/.${parseFloat(montoMembresia).toFixed(2)}`;
             } else {
                 throw new Error('No se pudo obtener el precio de la membresía desde la inscripción.');
             }
@@ -30,8 +28,8 @@ document.addEventListener('DOMContentLoaded', async () => {
             console.error('Error al cargar datos de la membresía:', error);
             pagoErrorMessage.textContent = 'Error al cargar los detalles de la membresía. Por favor, intenta más tarde.';
             pagoErrorMessage.style.display = 'block';
-            pagoForm.querySelector('button[type="submit"]').disabled = true; // Deshabilitar el botón de pago
-            return; // Detener la ejecución si no se puede obtener el monto
+            pagoForm.querySelector('button[type="submit"]').disabled = true;
+            return;
         }
     } else {
         pagoErrorMessage.textContent = 'ID de inscripción de membresía no proporcionado. No se puede procesar el pago.';
@@ -53,10 +51,10 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         const pagoData = {
             miembroId: parseInt(miembroId),
-            inscripcionMembresiaId: parseInt(inscripcionMembresiaId), // <-- ¡YA ES EL REAL!
-            monto: montoMembresia, // <-- ¡USAMOS EL MONTO REAL OBTENIDO!
+            inscripcionMembresiaId: parseInt(inscripcionMembresiaId),
+            monto: montoMembresia,
             metodoPago: "Tarjeta de Crédito/Débito",
-            estado: "COMPLETADO" // Establecer un estado para el pago
+            estado: "COMPLETADO"
         };
 
         try {

@@ -49,10 +49,8 @@ document.addEventListener('DOMContentLoaded', () => {
             fechaNacimiento: data.fechaNacimiento,
             contrasena: data.contrasena,
             activo: true,
-            membresiaId: parseInt(document.getElementById('selectedMembershipId').value) // Asegúrate de obtenerlo del hidden input
+            membresiaId: parseInt(document.getElementById('selectedMembershipId').value)
         };
-
-        // NO NECESITAMOS 'const membresiaId = data.membresiaId;' aquí, ya está en miembroData
 
         try {
             const response = await fetch('/api/miembros/registrar', {
@@ -64,14 +62,14 @@ document.addEventListener('DOMContentLoaded', () => {
             });
 
             if (response.ok) {
-                // *** ¡CAMBIO CRÍTICO AQUÍ! ***
-                const registroResponse = await response.json(); // Esperamos el { miembroId, inscripcionId, mensaje }
+
+                const registroResponse = await response.json();
 
                 registrationSuccessMessage.textContent = `¡Registro exitoso! Redirigiendo a la página de pago...`;
                 registrationSuccessMessage.style.display = 'block';
 
                 setTimeout(() => {
-                    // Redirige usando el inscripcionId devuelto por el backend
+
                     window.location.href = `/pago?miembroId=${registroResponse.miembroId}&inscripcionMembresiaId=${registroResponse.inscripcionId}`;
                 }, 2000);
             } else {

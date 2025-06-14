@@ -26,7 +26,7 @@ public class Asistencia {
     private LocalDateTime fechaHoraEntrada;
 
     @ManyToOne
-    @JoinColumn(name = "id_registrador", nullable = false) // El usuario (recepcionista) que registró la asistencia
+    @JoinColumn(name = "id_registrador", nullable = false)
     private Usuario registrador;
 
 }

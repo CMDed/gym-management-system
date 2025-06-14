@@ -13,9 +13,8 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.header.writers.frameoptions.XFrameOptionsHeaderWriter;
 import org.springframework.security.web.header.writers.frameoptions.XFrameOptionsHeaderWriter.XFrameOptionsMode;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.web.util.matcher.AntPathRequestMatcher; // ¡¡¡VOLVEMOS A IMPORTAR ESTO!!!
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
-// Elimina esta línea si la tenías:
 // import static org.springframework.security.web.util.matcher.RequestMatchers.antMatcher;
 
 @Configuration

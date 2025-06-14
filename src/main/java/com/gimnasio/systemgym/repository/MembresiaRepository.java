@@ -10,5 +10,5 @@ import java.util.List;
 @Repository
 public interface MembresiaRepository extends JpaRepository<Membresia, Long> {
     Optional<Membresia> findByNombrePlan(String nombrePlan);
-    List<Membresia> findByActivoTrue(); // Encuentra todas las membresías donde 'activo' es true
+    List<Membresia> findByActivoTrue();
 }

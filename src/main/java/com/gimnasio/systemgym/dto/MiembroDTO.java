@@ -1,6 +1,6 @@
 package com.gimnasio.systemgym.dto;
 
-import com.gimnasio.systemgym.model.Miembro.Sexo; // Importa el Enum Sexo de Miembro
+import com.gimnasio.systemgym.model.Miembro.Sexo;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -17,7 +17,7 @@ import lombok.AllArgsConstructor;
 @AllArgsConstructor
 public class MiembroDTO {
 
-    private Long id; // Puede ser útil para el PUT
+    private Long id;
 
     @NotBlank(message = "El tipo de identificación no puede estar en blanco")
     @Size(max = 50, message = "El tipo de identificación no puede exceder los 50 caracteres")
@@ -46,7 +46,7 @@ public class MiembroDTO {
     private String telefono;
 
     @NotNull(message = "El sexo no puede ser nulo")
-    private Sexo sexo; // Mantienes tu Enum Sexo
+    private Sexo sexo;
 
     @NotNull(message = "La fecha de nacimiento no puede ser nula")
     @PastOrPresent(message = "La fecha de nacimiento no puede ser en el futuro")
@@ -57,9 +57,8 @@ public class MiembroDTO {
     private String contrasena;
 
     @NotNull(message = "El estado activo no puede ser nulo")
-    private Boolean activo; // Aunque lo setearemos a true en el controller por defecto
+    private Boolean activo;
 
-    // --- ¡AÑADE ESTO! ---
     @NotNull(message = "El ID de la membresía no puede ser nulo.")
     private Long membresiaId;
 }

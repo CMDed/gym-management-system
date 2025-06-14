@@ -1,15 +1,15 @@
 package com.gimnasio.systemgym.controller;
 
 import com.gimnasio.systemgym.model.Miembro;
-import com.gimnasio.systemgym.model.InscripcionMembresia; // ¡IMPORTAR!
+import com.gimnasio.systemgym.model.InscripcionMembresia;
 import com.gimnasio.systemgym.service.MiembroService;
-import com.gimnasio.systemgym.service.InscripcionMembresiaService; // ¡IMPORTAR!
+import com.gimnasio.systemgym.service.InscripcionMembresiaService;
 import com.gimnasio.systemgym.dto.MiembroDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-// import org.springframework.security.crypto.password.PasswordEncoder; // <-- ¡ELIMINAR ESTA IMPORTACIÓN!
+// import org.springframework.security.crypto.password.PasswordEncoder;
 
 import jakarta.validation.Valid;
 import java.time.LocalDateTime;
@@ -20,15 +20,15 @@ import java.util.Optional;
 public class MiembroController {
 
     private final MiembroService miembroService;
-    private final InscripcionMembresiaService inscripcionMembresiaService; // ¡NUEVO CAMPO!
-    // private final PasswordEncoder passwordEncoder; // <-- ¡ELIMINAR ESTE CAMPO!
+    private final InscripcionMembresiaService inscripcionMembresiaService;
+    // private final PasswordEncoder passwordEncoder;
 
     @Autowired
     public MiembroController(MiembroService miembroService,
-                             InscripcionMembresiaService inscripcionMembresiaService) { // <-- ¡MODIFICAR CONSTRUCTOR!
+                             InscripcionMembresiaService inscripcionMembresiaService) {
         this.miembroService = miembroService;
         this.inscripcionMembresiaService = inscripcionMembresiaService;
-        // this.passwordEncoder = passwordEncoder; // No se asigna aquí
+        // this.passwordEncoder = passwordEncoder;
     }
 
     @PostMapping("/registrar")
@@ -43,25 +43,22 @@ public class MiembroController {
             nuevoMiembro.setSexo(miembroDTO.getSexo());
             nuevoMiembro.setTelefono(miembroDTO.getTelefono());
             nuevoMiembro.setFechaNacimiento(miembroDTO.getFechaNacimiento());
-            nuevoMiembro.setContrasena(miembroDTO.getContrasena()); // La encriptación se hace en el Service
-            nuevoMiembro.setActivo(true); // Siempre activo al registrarse
-            nuevoMiembro.setFechaRegistro(LocalDateTime.now()); // Fecha y hora actual del registro
+            nuevoMiembro.setContrasena(miembroDTO.getContrasena());
+            nuevoMiembro.setActivo(true);
+            nuevoMiembro.setFechaRegistro(LocalDateTime.now());
 
-            Miembro miembroGuardado = miembroService.registrarNuevoMiembro(nuevoMiembro); // El servicio valida unicidad y encripta
+            Miembro miembroGuardado = miembroService.registrarNuevoMiembro(nuevoMiembro);
 
-            // --- ¡CRÍTICO: CREAR LA INSCRIPCIÓN DE LA MEMBRESÍA AQUÍ! ---
-            Long membresiaId = miembroDTO.getMembresiaId(); // Asegúrate de que MiembroDTO tiene este campo
+            Long membresiaId = miembroDTO.getMembresiaId();
             if (membresiaId == null) {
                 return new ResponseEntity<>("El ID de la membresía es requerido para la inscripción.", HttpStatus.BAD_REQUEST);
             }
 
-            // Llama al nuevo método para crear la inscripción con estado PENDIENTE_PAGO
             InscripcionMembresia nuevaInscripcion = inscripcionMembresiaService.crearInscripcionInicial(
                     miembroGuardado.getId(),
                     membresiaId
             );
 
-            // Clase interna para la respuesta, incluyendo el ID de la inscripción
             class RegistroResponse {
                 public Long miembroId;
                 public Long inscripcionId;
@@ -83,7 +80,6 @@ public class MiembroController {
         }
     }
 
-    // --- MANTÉN TUS OTROS MÉTODOS Y AJUSTA EL PUT/UPDATE ---
     @PutMapping("/{id}")
     public ResponseEntity<?> actualizarMiembro(@PathVariable Long id, @Valid @RequestBody MiembroDTO miembroDTO) {
         if (miembroDTO.getId() == null || !id.equals(miembroDTO.getId())) {
@@ -102,14 +98,12 @@ public class MiembroController {
             miembroExistente.setTelefono(miembroDTO.getTelefono());
             miembroExistente.setFechaNacimiento(miembroDTO.getFechaNacimiento());
 
-            // Solo actualiza la contraseña si se proporciona una nueva (no nula y no vacía)
-            // y la encriptación se hace en el servicio.
             if (miembroDTO.getContrasena() != null && !miembroDTO.getContrasena().isEmpty()) {
-                miembroExistente.setContrasena(miembroDTO.getContrasena()); // Envía la contraseña sin encriptar al servicio
+                miembroExistente.setContrasena(miembroDTO.getContrasena());
             }
             miembroExistente.setActivo(miembroDTO.getActivo());
 
-            Miembro miembroActualizado = miembroService.actualizarMiembro(miembroExistente); // El servicio se encarga de la encriptación si aplica
+            Miembro miembroActualizado = miembroService.actualizarMiembro(miembroExistente);
             return new ResponseEntity<>(miembroActualizado, HttpStatus.OK);
         } catch (IllegalArgumentException e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
@@ -118,6 +112,4 @@ public class MiembroController {
             return new ResponseEntity<>("Error interno del servidor al actualizar miembro: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
-
-    // ... (Mantén tus otros métodos @GetMapping, @DeleteMapping) ...
 }

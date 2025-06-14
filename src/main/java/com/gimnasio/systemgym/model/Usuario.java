@@ -20,10 +20,10 @@ public class Usuario {
     private String username;
 
     @Column(name = "password", nullable = false, length = 255)
-    private String password; // Almacenaremos el hash de la contraseña
+    private String password;
 
     @Column(name = "rol", nullable = false, length = 50)
-    private String rol; // Ej. "RECEPCIONISTA", "ADMINISTRADOR"
+    private String rol;
 
     @Column(name = "nombre", nullable = false, length = 100)
     private String nombre;
@@ -31,10 +31,10 @@ public class Usuario {
     @Column(name = "apellido", nullable = false, length = 100)
     private String apellido;
 
-    @Column(name = "email", unique = true, length = 150) // Email puede ser null para algunos usuarios
+    @Column(name = "email", unique = true, length = 150)
     private String email;
 
     @Column(name = "activo", nullable = false)
-    private Boolean activo; // Si la cuenta de usuario está activa
+    private Boolean activo;
 
 }
