@@ -29,6 +29,7 @@ public class MiembroController {
         this.miembroService = miembroService;
         this.inscripcionMembresiaService = inscripcionMembresiaService;
         // this.passwordEncoder = passwordEncoder;
+
     }
 
     @PostMapping("/registrar")
