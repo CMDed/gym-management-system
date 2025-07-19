@@ -1,0 +1,184 @@
+.membresias-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+    background-color: #1a1a1a;
+    color: #eee;
+}
+.membresias-table th, .membresias-table td {
+    border: 1px solid #333;
+    padding: 12px 15px;
+    text-align: left;
+    vertical-align: middle;
+}
+.membresias-table th {
+    background-color: #2a2a2a;
+    color: #ffd500;
+    text-transform: uppercase;
+    font-size: 0.9em;
+    letter-spacing: 0.5px;
+}
+.membresias-table tr:nth-child(even) {
+    background-color: #1f1f1f;
+}
+.membresias-table tr:hover {
+    background-color: #2f2f2f;
+}
+
+.action-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    justify-content: center;
+    align-items: center;
+}
+
+.action-buttons a, .action-buttons button {
+    padding: 6px 12px;
+    border-radius: 4px;
+    text-decoration: none;
+    font-size: 0.85em;
+    font-weight: bold;
+    transition: background-color 0.3s ease;
+    white-space: nowrap;
+    line-height: 1.2;
+    text-align: center;
+    min-width: 80px;
+}
+
+.edit-btn {
+    background-color: #ffd500;
+    color: #222;
+    border: 1px solid #ffd500;
+}
+.edit-btn:hover {
+    background-color: #e0b800;
+}
+.delete-btn {
+    background-color: #d82c2c;
+    color: white;
+    border: none;
+    cursor: pointer;
+}
+.delete-btn:hover {
+    background-color: #a72020;
+}
+.toggle-active-btn {
+    color: white;
+    border: none;
+    cursor: pointer;
+}
+.toggle-active-btn.active {
+    background-color: #28a745;
+}
+.toggle-active-btn.active:hover {
+    background-color: #218838;
+}
+.toggle-active-btn.inactive {
+    background-color: #007bff;
+}
+.toggle-active-btn.inactive:hover {
+    background-color: #0056b3;
+}
+
+.add-new-btn {
+    display: inline-block;
+    margin-top: 30px;
+    padding: 12px 25px;
+    background-color: #d82c2c;
+    color: white;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: bold;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+.add-new-btn:hover {
+    background-color: #a72020;
+    transform: translateY(-2px);
+}
+.messages {
+    margin-bottom: 20px;
+    padding: 15px;
+    border-radius: 8px;
+    font-weight: bold;
+    text-align: center;
+}
+.messages.success {
+    background-color: #4CAF50;
+    color: white;
+}
+.messages.error {
+    background-color: #f44336;
+    color: white;
+}
+
+.membresia-form {
+    background-color: #2a2a2a;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+    max-width: 600px;
+    margin: 30px auto;
+    color: #eee;
+}
+.membresia-form label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: bold;
+    color: #ffd500;
+}
+.membresia-form input[type="text"],
+.membresia-form input[type="number"],
+.membresia-form textarea {
+    width: calc(100% - 22px);
+    padding: 10px;
+    margin-bottom: 20px;
+    border: 1px solid #555;
+    border-radius: 5px;
+    background-color: #1f1f1f;
+    color: #eee;
+    font-size: 1rem;
+    box-sizing: border-box;
+}
+.membresia-form textarea {
+    resize: vertical;
+    min-height: 80px;
+}
+.membresia-form input[type="checkbox"] {
+    margin-right: 10px;
+    transform: scale(1.2);
+}
+.membresia-form .checkbox-group {
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px;
+}
+.membresia-form button[type="submit"] {
+    background-color: #d82c2c;
+    color: white;
+    padding: 12px 25px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1.1rem;
+    font-weight: bold;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    margin-right: 15px;
+}
+.membresia-form button[type="submit"]:hover {
+    background-color: #a72020;
+    transform: translateY(-2px);
+}
+.membresia-form .back-link {
+    display: inline-block;
+    padding: 12px 25px;
+    background-color: #333;
+    color: white;
+    border-radius: 5px;
+    text-decoration: none;
+    font-weight: bold;
+    transition: background-color 0.3s ease;
+}
+.membresia-form .back-link:hover {
+    background-color: #555;
+}

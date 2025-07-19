@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Panel de Administrador - SystemGym</title>
+
+  <link rel="stylesheet" th:href="@{/css/nuevo-estilo.css}">
+  <link rel="stylesheet" th:href="@{/css/admin-dashboard-styles.css}">
+
+  <link rel="icon" th:href="@{/images/logo.png}" type="image/png">
+  <link href="https://fonts.googleapis.com/css2?family=Anton&display=swap" rel="stylesheet">
+</head>
+<body>
+<header>
+  <div class="logo-container">
+    <a th:href="@{/}">
+      <img th:src="@{/images/logo.png}" alt="Logo SystemGym">
+    </a>
+  </div>
+  <nav>
+    <ul>
+      <div class="icon-container">
+        <a th:href="@{/dashboard}">
+          <img th:src="@{/images/usuario.png}" alt="Mi Perfil" id="icono-inicio-sesion">
+        </a>
+      </div>
+    </li>
+
+      <li sec:authorize="isAuthenticated()">
+        <form th:action="@{/logout}" method="post" style="display:inline;">
+          <button type="submit" class="logout-button">CERRAR SESIÓN</button>
+        </form>
+      </li>
+    </ul>
+  </nav>
+</header>
+
+<main class="admin-dashboard-main">
+  <section class="admin-dashboard-card">
+    <h2 class="admin-welcome-title">Bienvenido, <span th:text="${username}"></span>!</h2>
+    <p class="admin-subtitle">Este es el panel de control del administrador.</p>
+
+    <div class="admin-section">
+      <h3 class="admin-section-title">Gestión de Membresías</h3>
+      <ul>
+        <li><a th:href="@{/admin/membresias/crear}">Crear Nueva Membresía</a></li>
+        <li><a th:href="@{/admin/membresias/ver}">Ver/Editar/Eliminar Membresías</a></li>
+      </ul>
+    </div>
+
+    <div class="admin-section">
+      <h3 class="admin-section-title">Gestión de Empleados</h3>
+      <ul>
+        <li><a th:href="@{/admin/empleados/registrar}">Registrar Nuevo Empleado</a></li>
+        <li><a th:href="@{/admin/empleados/ver}">Ver/Editar/Eliminar Empleados</a></li>
+      </ul>
+    </div>
+
+    <div class="admin-section">
+      <h3 class="admin-section-title">Historial de Clientes</h3>
+      <form th:action="@{/admin/clientes/buscar}" method="get">
+        <label for="dniSearch">Buscar historial por DNI:</label>
+        <input type="text" id="dniSearch" name="dni" placeholder="Ingresa DNI del cliente">
+        <button type="submit">Buscar</button>
+      </form>
+    </div>
+
+  </section>
+</main>
+
+<footer>
+  <div class="logo-footer">
+    <a th:href="@{/}">
+      <img th:src="@{/images/logo.png}" alt="Logo SystemGym"><br><br>
+    </a>
+  </div>
+
+  <div class="footer_container">
+    <div class="redes-sociales">
+      <strong>Redes Sociales:</strong><br><br>
+      <a href="#" target="_blank"><img th:src="@{/images/FB.png}" alt="Facebook" class="icono-red"></a>
+      <a href="https://www.instagram.com/aresfitness.peru/" target="_blank"><img th:src="@{/images/Insta.png}" alt="Instagram" class="icono-red"></a>
+      <a href="#" target="_blank"><img th:src="@{/images/Tiktok.png}" alt="Tiktok" class="icono-red"></a>
+      <a href="#" target="_blank"><img th:src="@{/images/X.png}" alt="X" class="icono-red"></a>
+      <br><br>
+      <strong>CONTÁCTANOS:</strong><br><br>
+      <a href="#" target="_blank"><img th:src="@{/images/WhatsApp.png}" alt="WhatsApp" style="width: 20px; vertical-align: middle;"></a><br><br>
+      <a href="#" target="_blank"><img th:src="@{/images/Gmail.png}" alt="Correo electrónico" style="width: 20px; vertical-align: middle;"></a>
+    </div>
+
+    <div class="footer-section">
+      <a href="#">TÉRMINOS Y CONDICIONES</a><br><br><br>
+      <a href="#">POLÍTICAS Y PRIVACIDAD</a><br><br><br>
+      <a href="#">QUEJAS Y RECLAMOS</a>
+    </div>
+
+    <div class="footer-section" style="text-align: center;">
+      <a href="#">SOPORTE TÉCNICO</a><br><br><br>
+      <a th:href="@{/}">SYSTEMGYM</a><br><br><br><br>
+      <img th:src="@{/images/LibroR.png}" alt="Libro de Reclamaciones" style="width: 150px;">
+    </div>
+  </div>
+
+  <p>© 2025 SystemGym. Todos los derechos reservados.</p>
+</footer>
+</body>
+</html>

@@ -2,11 +2,13 @@ package com.gimnasio.systemgym.service;
 
 import com.gimnasio.systemgym.model.Miembro;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.time.LocalDate;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 
 public class MiembroDetails implements UserDetails {
 
@@ -39,7 +41,7 @@ public class MiembroDetails implements UserDetails {
         this.correo = miembro.getCorreo();
         this.activo = miembro.getActivo();
 
-        this.authorities = Collections.emptyList();
+        this.authorities = List.of(new SimpleGrantedAuthority("ROLE_" + miembro.getRol().toUpperCase()));
     }
 
     public Miembro getMiembro() {

@@ -53,9 +53,12 @@ public class Miembro {
     @Column(name = "activo", nullable = false)
     private Boolean activo;
 
+    // **** AÑADE ESTE CAMPO ****
+    @Column(name = "rol", nullable = false, length = 50)
+    private String rol = "MIEMBRO";
+
     public enum Sexo {
         MASCULINO,
-        FEMENINO,
-        OTRO
+        FEMENINO
     }
 }

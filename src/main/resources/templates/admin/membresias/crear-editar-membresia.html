@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title th:text="${modoEdicion ? 'Editar Membresía' : 'Crear Nueva Membresía'} + ' - Admin'"></title>
+  <link rel="stylesheet" th:href="@{/css/nuevo-estilo.css}">
+  <link rel="stylesheet" th:href="@{/css/admin-dashboard-styles.css}">
+  <link rel="stylesheet" th:href="@{/css/admin-membresias-styles.css}">
+  <link rel="icon" th:href="@{/images/logo.png}" type="image/png">
+  <link href="https://fonts.googleapis.com/css2?family=Anton&display=swap" rel="stylesheet">
+</head>
+<body>
+<header>
+  <div class="logo-container">
+    <a th:href="@{/}">
+      <img th:src="@{/images/logo.png}" alt="Logo SystemGym">
+    </a>
+  </div>
+  <nav>
+    <ul>
+      <li><a th:href="@{/}">INICIO</a></li>
+      <li><a th:href="@{/membresias}">PLANES</a></li>
+      <li sec:authorize="hasRole('ADMIN')"><a th:href="@{/admin/dashboard}">ADMIN DASHBOARD</a></li>
+      <li>
+        <div class="icon-container">
+          <a th:href="@{/dashboard}">
+            <img th:src="@{/images/usuario.png}" alt="Mi Perfil" id="icono-inicio-sesion">
+          </a>
+        </div>
+      </li>
+      <li sec:authorize="!isAuthenticated()"><a th:href="@{/login}">INICIAR SESIÓN</a></li>
+      <li sec:authorize="isAuthenticated()">
+        <form th:action="@{/logout}" method="post" style="display:inline;">
+          <button type="submit" class="logout-button">CERRAR SESIÓN</button>
+        </form>
+      </li>
+    </ul>
+  </nav>
+</header>
+
+<main class="admin-dashboard-main">
+  <section class="admin-dashboard-card">
+    <h2 class="admin-welcome-title" th:text="${modoEdicion ? 'Editar Membresía' : 'Crear Nueva Membresía'}">Crear Nueva Membresía</h2>
+    <p class="admin-subtitle" th:text="${modoEdicion ? 'Modifica los detalles de la membresía.' : 'Completa los datos para añadir un nuevo plan de membresía.'}"></p>
+
+    <div th:if="${error}" class="messages error">
+      <p th:text="${error}"></p>
+    </div>
+
+    <form th:action="@{/admin/membresias/guardar}" th:object="${membresia}" method="post" class="membresia-form">
+      <input type="hidden" th:field="*{id}" th:if="${modoEdicion}" />
+
+      <div>
+        <label for="nombrePlan">Nombre del Plan:</label>
+        <input type="text" id="nombrePlan" th:field="*{nombrePlan}" required />
+      </div>
+
+      <div>
+        <label for="descripcion">Descripción:</label>
+        <textarea id="descripcion" th:field="*{descripcion}"></textarea>
+      </div>
+
+      <div>
+        <label for="precio">Precio:</label>
+        <input type="number" id="precio" th:field="*{precio}" step="0.01" min="0" required />
+      </div>
+
+      <div>
+        <label for="duracionDias">Duración (Días):</label>
+        <input type="number" id="duracionDias" th:field="*{duracionDias}" min="1" required />
+      </div>
+
+      <div class="checkbox-group">
+        <input type="checkbox" id="activo" th:field="*{activo}" />
+        <label for="activo">Activa</label>
+      </div>
+
+      <button type="submit" th:text="${modoEdicion ? 'Actualizar Membresía' : 'Crear Membresía'}">Crear Membresía</button>
+      <a th:href="@{/admin/membresias/ver}" class="back-link">Cancelar y Volver</a>
+    </form>
+
+  </section>
+</main>
+
+<footer>
+  <div class="logo-footer">
+    <a th:href="@{/}">
+      <img th:src="@{/images/logo.png}" alt="Logo SystemGym"><br><br>
+    </a>
+  </div>
+
+  <div class="footer_container">
+    <div class="redes-sociales">
+      <strong>Redes Sociales:</strong><br><br>
+      <a href="#" target="_blank"><img th:src="@{/images/FB.png}" alt="Facebook" class="icono-red"></a>
+      <a href="https://www.instagram.com/aresfitness.peru/" target="_blank"><img th:src="@{/images/Insta.png}" alt="Instagram" class="icono-red"></a>
+      <a href="#" target="_blank"><img th:src="@{/images/Tiktok.png}" alt="Tiktok" class="icono-red"></a>
+      <a href="#" target="_blank"><img th:src="@{/images/X.png}" alt="X" class="icono-red"></a>
+      <br><br>
+      <strong>CONTÁCTANOS:</strong><br><br>
+      <a href="#" target="_blank"><img th:src="@{/images/WhatsApp.png}" alt="WhatsApp" style="width: 20px; vertical-align: middle;"></a><br><br>
+      <a href="#" target="_blank"><img th:src="@{/images/Gmail.png}" alt="Correo electrónico" style="width: 20px; vertical-align: middle;"></a>
+    </div>
+
+    <div class="footer-section">
+      <a href="#">TÉRMINOS Y CONDICIONES</a><br><br><br>
+      <a href="#">POLÍTICAS Y PRIVACIDAD</a><br><br><br>
+      <a href="#">QUEJAS Y RECLAMOS</a>
+    </div>
+
+    <div class="footer-section" style="text-align: center;">
+      <a href="#">SOPORTE TÉCNICO</a><br><br><br>
+      <a th:href="@{/}">SYSTEMGYM</a><br><br><br><br>
+      <img th:src="@{/images/LibroR.png}" alt="Libro de Reclamaciones" style="width: 150px;">
+    </div>
+  </div>
+
+  <p>© 2025 SystemGym. Todos los derechos reservados.</p>
+</footer>
+</body>
+</html>

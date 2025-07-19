@@ -40,6 +40,27 @@ body {
     overflow-x: hidden;
 }
 
+.logout-button {
+    background-color: #d82c2c;
+    color: white;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    font-weight: bold;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+}
+
+.logout-button:hover {
+    background-color: #a72020;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.4);
+}
+
 header {
     display: flex;
     justify-content: space-between;
