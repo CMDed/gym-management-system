@@ -2,6 +2,7 @@ package com.gimnasio.systemgym.controller;
 
 import com.gimnasio.systemgym.model.InscripcionMembresia;
 import com.gimnasio.systemgym.service.InscripcionMembresiaService;
+import com.gimnasio.systemgym.dto.PagoInscripcionDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -126,6 +127,32 @@ public class InscripcionMembresiaController {
             return new ResponseEntity<>("Estados de membresías vencidas actualizados exitosamente.", HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>("Error al actualizar estados de membresías vencidas: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @PostMapping("/procesar-pago")
+    public ResponseEntity<?> procesarPagoCompleto(@RequestBody PagoInscripcionDTO pagoDto) {
+        System.out.println("DEBUG: LLEGUE AQUI EN EL CONTROLADOR - procesarPagoCompleto");
+        System.out.println("DEBUG: Datos recibidos en DTO: MiembroID=" + pagoDto.getMiembroId() +
+                ", MembresiaID=" + pagoDto.getMembresiaId() +
+                ", NumTarjeta=" + (pagoDto.getNumeroTarjeta() != null ? pagoDto.getNumeroTarjeta().substring(0,4) + "..." : "null"));
+
+        try {
+            InscripcionMembresia inscripcionActualizada = inscripcionMembresiaService.crearOActualizarInscripcionConPago(
+                    pagoDto.getMiembroId(),
+                    pagoDto.getMembresiaId(),
+                    pagoDto.getNumeroTarjeta(),
+                    pagoDto.getFechaVencimiento(),
+                    pagoDto.getCvv()
+            );
+            return new ResponseEntity<>(inscripcionActualizada, HttpStatus.OK);
+        } catch (IllegalArgumentException e) {
+            System.err.println("ERROR en procesarPagoCompleto (BAD_REQUEST): " + e.getMessage());
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        } catch (Exception e) {
+            System.err.println("ERROR en procesarPagoCompleto (INTERNAL_SERVER_ERROR): " + e.getMessage());
+            e.printStackTrace();
+            return new ResponseEntity<>("Error interno al procesar el pago.", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 }

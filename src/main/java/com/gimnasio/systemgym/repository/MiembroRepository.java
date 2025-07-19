@@ -12,6 +12,7 @@ import java.util.List;
 @Repository
 public interface MiembroRepository extends JpaRepository<Miembro, Long> {
     Optional<Miembro> findByCorreo(String correo);
+
     Optional<Miembro> findByNumeroIdentificacion(String numeroIdentificacion);
 
     List<Miembro> findByNombreContainingIgnoreCaseOrApellidoContainingIgnoreCaseOrNumeroIdentificacionContainingIgnoreCase(String nombre, String apellido, String numeroIdentificacion);
@@ -28,4 +29,10 @@ public interface MiembroRepository extends JpaRepository<Miembro, Long> {
             "      LOWER(m.apellido) LIKE LOWER(CONCAT('%', :query, '%')) OR " +
             "      LOWER(m.numeroIdentificacion) LIKE LOWER(CONCAT('%', :query, '%'))")
     List<Miembro> findBySearchQueryWithInscriptionsAndMembershipDetails(@Param("query") String query);
+
+    @Query("SELECT m FROM Miembro m LEFT JOIN FETCH m.inscripcionesMembresia im LEFT JOIN FETCH im.membresia WHERE m.correo = :correo")
+    Optional<Miembro> findByCorreoWithInscriptionsAndMembershipDetails(@Param("correo") String correo);
+
+    @Query("SELECT m FROM Miembro m LEFT JOIN FETCH m.inscripcionesMembresia im LEFT JOIN FETCH im.membresia WHERE m.numeroIdentificacion = :numeroIdentificacion")
+    Optional<Miembro> findByNumeroIdentificacionWithInscriptionsAndMembershipDetails(@Param("numeroIdentificacion") String numeroIdentificacion);
 }

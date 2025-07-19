@@ -106,12 +106,12 @@ public class MiembroService {
 
     @Transactional(readOnly = true)
     public Optional<Miembro> obtenerMiembroPorCorreo(String correo) {
-        return miembroRepository.findByCorreo(correo);
+        return miembroRepository.findByCorreoWithInscriptionsAndMembershipDetails(correo);
     }
 
     @Transactional(readOnly = true)
     public Optional<Miembro> obtenerMiembroPorNumeroIdentificacion(String numeroIdentificacion) {
-        return miembroRepository.findByNumeroIdentificacion(numeroIdentificacion);
+        return miembroRepository.findByNumeroIdentificacionWithInscriptionsAndMembershipDetails(numeroIdentificacion);
     }
 
     @Transactional(readOnly = true)
@@ -139,6 +139,15 @@ public class MiembroService {
 
     @Transactional(readOnly = true)
     public Optional<InscripcionMembresia> obtenerMembresiaActivaActual(Miembro miembro) {
+        System.out.println("DEBUG: Evaluando membresias activas para Miembro ID: " + miembro.getId());
+        miembro.getInscripcionesMembresia().forEach(insc -> {
+            System.out.println("DEBUG: Inscripcion ID: " + insc.getId() +
+                    ", Estado: " + insc.getEstado() +
+                    ", FechaInicio: " + insc.getFechaInicio() +
+                    ", FechaFin: " + insc.getFechaFin() +
+                    ", isAfterNow: " + (insc.getFechaFin() != null ? insc.getFechaFin().isAfter(LocalDate.now()) : "N/A"));
+        });
+
         return miembro.getInscripcionesMembresia().stream()
                 .filter(inscripcion -> "COMPLETADO".equalsIgnoreCase(inscripcion.getEstado()) &&
                         inscripcion.getFechaFin() != null &&

@@ -8,6 +8,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const montoPagarDisplay = document.getElementById('montoPagarDisplay');
 
     let montoMembresia = 0;
+    let membresiaIdParaPago = null;
 
     if (inscripcionMembresiaId) {
         try {
@@ -17,11 +18,12 @@ document.addEventListener('DOMContentLoaded', async () => {
             }
             const inscripcionData = await inscripcionResponse.json();
 
-            if (inscripcionData.membresia && inscripcionData.membresia.precio) {
+            if (inscripcionData.membresia && inscripcionData.membresia.precio && inscripcionData.membresia.id) {
                 montoMembresia = inscripcionData.membresia.precio;
+                membresiaIdParaPago = inscripcionData.membresia.id;
                 montoPagarDisplay.textContent = `S/.${parseFloat(montoMembresia).toFixed(2)}`;
             } else {
-                throw new Error('No se pudo obtener el precio de la membresía desde la inscripción.');
+                throw new Error('No se pudo obtener el precio o el ID de la membresía desde la inscripción.');
             }
 
         } catch (error) {
@@ -38,7 +40,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         return;
     }
 
-
     pagoForm.addEventListener('submit', async (event) => {
         event.preventDefault();
 
@@ -49,16 +50,22 @@ document.addEventListener('DOMContentLoaded', async () => {
         const fechaVencimiento = document.getElementById('fechaVencimiento').value;
         const cvv = document.getElementById('cvv').value;
 
+        if (!numeroTarjeta || !fechaVencimiento || !cvv) {
+            pagoErrorMessage.textContent = 'Por favor, completa todos los campos de pago.';
+            pagoErrorMessage.style.display = 'block';
+            return;
+        }
+
         const pagoData = {
             miembroId: parseInt(miembroId),
-            inscripcionMembresiaId: parseInt(inscripcionMembresiaId),
-            monto: montoMembresia,
-            metodoPago: "Tarjeta de Crédito/Débito",
-            estado: "COMPLETADO"
+            membresiaId: membresiaIdParaPago,
+            numeroTarjeta: numeroTarjeta,
+            fechaVencimiento: fechaVencimiento,
+            cvv: cvv
         };
 
         try {
-            const response = await fetch('/api/pagos/procesar', {
+            const response = await fetch('/api/inscripciones/procesar-pago', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -67,12 +74,12 @@ document.addEventListener('DOMContentLoaded', async () => {
             });
 
             if (response.ok) {
-                const pagoConfirmado = await response.json();
-                pagoSuccessMessage.textContent = `¡Pago #${pagoConfirmado.id} procesado exitosamente! Redirigiendo al inicio de sesión...`;
+                const inscripcionActualizada = await response.json();
+                pagoSuccessMessage.textContent = `¡Pago procesado exitosamente! Tu membresía ${inscripcionActualizada.membresia.nombre} está ahora ${inscripcionActualizada.estado}. Redirigiendo...`;
                 pagoSuccessMessage.style.display = 'block';
 
                 setTimeout(() => {
-                    window.location.href = `/login`;
+                    window.location.href = `/dashboard`;
                 }, 2000);
             } else {
                 const errorBody = await response.json();

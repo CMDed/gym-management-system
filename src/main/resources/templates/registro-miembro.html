@@ -43,8 +43,8 @@
 
     <input type="hidden" id="selectedMembershipId" th:value="${selectedMembershipId}" th:if="${selectedMembershipId}">
 
-    <form id="registroMiembroForm">
-      <div class="form-grid"> <div class="form-group">
+    <form id="registroClienteForm"> <div class="form-grid">
+      <div class="form-group">
         <label for="tipoIdentificacion">Tipo de Identificación:</label>
         <select id="tipoIdentificacion" name="tipoIdentificacion" required>
           <option value="">Seleccione</option>
@@ -54,58 +54,58 @@
         </select>
       </div>
 
-        <div class="form-group">
-          <label for="numeroIdentificacion">Número de Identificación:</label>
-          <input type="text" id="numeroIdentificacion" name="numeroIdentificacion" required
-                 pattern="[0-9]+" title="Solo números permitidos." minlength="6" maxlength="20">
-        </div>
+      <div class="form-group">
+        <label for="numeroIdentificacion">Número de Identificación:</label>
+        <input type="text" id="numeroIdentificacion" name="numeroIdentificacion" required
+               pattern="[0-9]+" title="Solo números permitidos." minlength="6" maxlength="20">
+      </div>
 
-        <div class="form-group">
-          <label for="nombre">Nombre:</label>
-          <input type="text" id="nombre" name="nombre" required maxlength="100">
-        </div>
+      <div class="form-group">
+        <label for="nombre">Nombre:</label>
+        <input type="text" id="nombre" name="nombre" required maxlength="100">
+      </div>
 
-        <div class="form-group">
-          <label for="apellido">Apellido:</label>
-          <input type="text" id="apellido" name="apellido" required maxlength="100">
-        </div>
+      <div class="form-group">
+        <label for="apellido">Apellido:</label>
+        <input type="text" id="apellido" name="apellido" required maxlength="100">
+      </div>
 
-        <div class="form-group">
-          <label for="correo">Correo Electrónico:</label>
-          <input type="email" id="correo" name="correo" required maxlength="150">
-        </div>
+      <div class="form-group">
+        <label for="correo">Correo Electrónico:</label>
+        <input type="email" id="correo" name="correo" required maxlength="150">
+      </div>
 
-        <div class="form-group">
-          <label for="telefono">Teléfono (opcional):</label>
-          <input type="text" id="telefono" name="telefono" pattern="[0-9]{9}" title="Debe ser un número de 9 dígitos." maxlength="20">
-        </div>
+      <div class="form-group">
+        <label for="telefono">Teléfono (opcional):</label>
+        <input type="text" id="telefono" name="telefono" pattern="[0-9]{9}" title="Debe ser un número de 9 dígitos." maxlength="20">
+      </div>
 
-        <div class="form-group">
-          <label for="sexo">Sexo:</label>
-          <select id="sexo" name="sexo" required>
-            <option value="">Seleccione</option>
-            <option value="MASCULINO">Masculino</option>
-            <option value="FEMENINO">Femenino</option>
+      <div class="form-group">
+        <label for="sexo">Sexo:</label>
+        <select id="sexo" name="sexo" required>
+          <option value="">Seleccione</option>
+          <option value="MASCULINO">Masculino</option>
+          <option value="FEMENINO">Femenino</option>
+        </select>
+      </div>
 
-          </select>
-        </div>
+      <div class="form-group">
+        <label for="fechaNacimiento">Fecha de Nacimiento:</label>
+        <input type="date" id="fechaNacimiento" name="fechaNacimiento" required>
+      </div>
 
-        <div class="form-group">
-          <label for="fechaNacimiento">Fecha de Nacimiento:</label>
-          <input type="date" id="fechaNacimiento" name="fechaNacimiento" required>
-        </div>
+      <div class="form-group">
+        <label for="contrasena">Contraseña:</label>
+        <input type="password" id="contrasena" name="contrasena" required minlength="6">
+      </div>
 
-        <div class="form-group">
-          <label for="contrasena">Contraseña:</label>
-          <input type="password" id="contrasena" name="contrasena" required minlength="6">
-        </div>
+      <div class="form-group">
+        <label for="confirmarContrasena">Confirmar Contraseña:</label>
+        <input type="password" id="confirmarContrasena" name="confirmarContrasena" required minlength="6">
+      </div>
 
-        <div class="form-group">
-          <label for="confirmarContrasena">Confirmar Contraseña:</label>
-          <input type="password" id="confirmarContrasena" name="confirmarContrasena" required minlength="6">
-        </div>
-
-      </div> <p id="passwordMatchError" class="error-message" style="display: none;">Las contraseñas no coinciden.</p>
+    </div>
+      <p id="passwordMatchError" class="error-message" style="display: none;">Las contraseñas no coinciden.</p>
       <p id="registrationSuccessMessage" class="success-message" style="display: none;"></p>
       <p id="registrationErrorMessage" class="error-message" style="display: none;"></p>
 
@@ -150,6 +150,6 @@
   <p>&copy; 2025 SystemGym. Todos los derechos reservados.</p>
 </footer>
 
-<script th:src="@{/js/registro-miembro.js}"></script>
+<script th:src="@{/js/registro-cliente.js}"></script>
 </body>
 </html>
