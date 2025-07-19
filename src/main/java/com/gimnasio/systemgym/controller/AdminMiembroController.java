@@ -14,10 +14,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -108,60 +110,129 @@ public class AdminMiembroController {
                                  Model model,
                                  RedirectAttributes redirectAttributes) {
 
+        if (miembroDTO.getMembresiaId() != null) {
+            boolean hasPaymentData = miembroDTO.getNumeroTarjeta() != null && !miembroDTO.getNumeroTarjeta().isEmpty() &&
+                    miembroDTO.getFechaVencimiento() != null && !miembroDTO.getFechaVencimiento().isEmpty() &&
+                    miembroDTO.getCvv() != null && !miembroDTO.getCvv().isEmpty();
+
+            if (!hasPaymentData) {
+                if (miembroDTO.getNumeroTarjeta() == null || miembroDTO.getNumeroTarjeta().isEmpty()) {
+                    result.addError(new FieldError("miembroDTO", "numeroTarjeta", "El número de tarjeta es obligatorio para el pago inmediato."));
+                }
+                if (miembroDTO.getFechaVencimiento() == null || miembroDTO.getFechaVencimiento().isEmpty()) {
+                    result.addError(new FieldError("miembroDTO", "fechaVencimiento", "La fecha de vencimiento es obligatoria para el pago inmediato."));
+                }
+                if (miembroDTO.getCvv() == null || miembroDTO.getCvv().isEmpty()) {
+                    result.addError(new FieldError("miembroDTO", "cvv", "El CVV es obligatorio para el pago inmediato."));
+                }
+            } else {
+                try {
+                    String[] parts = miembroDTO.getFechaVencimiento().split("/");
+                    int month = Integer.parseInt(parts[0]);
+                    int year = 2000 + Integer.parseInt(parts[1]);
+
+                    LocalDate expiryDate = LocalDate.of(year, month, 1).plusMonths(1).minusDays(1);
+                    if (expiryDate.isBefore(LocalDate.now())) {
+                        result.addError(new FieldError("miembroDTO", "fechaVencimiento", "La tarjeta ha expirado."));
+                    }
+                } catch (Exception e) {
+                    result.addError(new FieldError("miembroDTO", "fechaVencimiento", "Formato de fecha de vencimiento inválido (MM/AA)."));
+                }
+            }
+        }
+
         if (result.hasErrors()) {
             model.addAttribute("modoEdicion", miembroDTO.getId() != null);
             model.addAttribute("sexoOpciones", Arrays.asList(Sexo.values()));
             model.addAttribute("membresiasDisponibles", membresiaService.obtenerMembresiasActivas());
+            model.addAttribute("error", "Por favor, corrige los errores en el formulario.");
             return "crear-editar-miembro";
         }
 
         try {
-            Miembro miembro = new Miembro();
-            miembro.setId(miembroDTO.getId());
-            miembro.setTipoIdentificacion(miembroDTO.getTipoIdentificacion());
-            miembro.setNumeroIdentificacion(miembroDTO.getNumeroIdentificacion());
-            miembro.setNombre(miembroDTO.getNombre());
-            miembro.setApellido(miembroDTO.getApellido());
-            miembro.setCorreo(miembroDTO.getCorreo());
-            miembro.setTelefono(miembroDTO.getTelefono());
-            miembro.setSexo(miembroDTO.getSexo());
-            miembro.setFechaNacimiento(miembroDTO.getFechaNacimiento());
-            miembro.setActivo(miembroDTO.getActivo());
+            Miembro miembro;
+            InscripcionMembresia inscripcionProcesada = null;
+            boolean isNewMiembro = (miembroDTO.getId() == null);
 
-            if (miembro.getId() == null) {
+            if (isNewMiembro) {
+                miembro = new Miembro();
+                miembro.setTipoIdentificacion(miembroDTO.getTipoIdentificacion());
+                miembro.setNumeroIdentificacion(miembroDTO.getNumeroIdentificacion());
+                miembro.setNombre(miembroDTO.getNombre());
+                miembro.setApellido(miembroDTO.getApellido());
+                miembro.setCorreo(miembroDTO.getCorreo());
+                miembro.setTelefono(miembroDTO.getTelefono());
+                miembro.setSexo(miembroDTO.getSexo());
+                miembro.setFechaNacimiento(miembroDTO.getFechaNacimiento());
                 miembro.setContrasena(miembroDTO.getContrasena());
-                Miembro nuevoMiembro = miembroService.registrarNuevoMiembro(miembro);
-                inscripcionMembresiaService.crearInscripcionInicial(nuevoMiembro.getId(), miembroDTO.getMembresiaId());
-                redirectAttributes.addFlashAttribute("success", "Miembro '" + nuevoMiembro.getNombre() + " " + nuevoMiembro.getApellido() + "' registrado exitosamente y membresía iniciada.");
+                miembro.setActivo(miembroDTO.getActivo() != null ? miembroDTO.getActivo() : true);
+                miembro.setFechaRegistro(java.time.LocalDateTime.now());
+                miembro.setRol("MIEMBRO");
+
+                miembro = miembroService.registrarNuevoMiembro(miembro);
+                redirectAttributes.addFlashAttribute("success", "Miembro '" + miembro.getNombre() + " " + miembro.getApellido() + "' registrado exitosamente.");
+
             } else {
+                miembro = miembroService.obtenerMiembroPorId(miembroDTO.getId())
+                        .orElseThrow(() -> new IllegalArgumentException("Miembro no encontrado para actualización."));
+
+                miembro.setTipoIdentificacion(miembroDTO.getTipoIdentificacion());
+                miembro.setNumeroIdentificacion(miembroDTO.getNumeroIdentificacion());
+                miembro.setNombre(miembroDTO.getNombre());
+                miembro.setApellido(miembroDTO.getApellido());
+                miembro.setCorreo(miembroDTO.getCorreo());
+                miembro.setTelefono(miembroDTO.getTelefono());
+                miembro.setSexo(miembroDTO.getSexo());
+                miembro.setFechaNacimiento(miembroDTO.getFechaNacimiento());
+                miembro.setActivo(miembroDTO.getActivo());
+
                 if (miembroDTO.getContrasena() != null && !miembroDTO.getContrasena().isEmpty()) {
                     miembro.setContrasena(miembroDTO.getContrasena());
-                } else {
-                    Miembro existente = miembroService.obtenerMiembroPorId(miembro.getId()).orElseThrow();
-                    miembro.setContrasena(existente.getContrasena());
                 }
-                miembroService.actualizarMiembro(miembro);
-
-                Optional<InscripcionMembresia> membresiaActivaActual = miembroService.obtenerMembresiaActivaActual(miembro);
-                if (miembroDTO.getMembresiaId() != null &&
-                        (membresiaActivaActual.isEmpty() || !membresiaActivaActual.get().getMembresia().getId().equals(miembroDTO.getMembresiaId()))) {
-                    inscripcionMembresiaService.crearInscripcionInicial(miembro.getId(), miembroDTO.getMembresiaId());
-                    redirectAttributes.addFlashAttribute("info", "Se ha iniciado una nueva inscripción pendiente de pago para el miembro.");
-                }
-
-                redirectAttributes.addFlashAttribute("success", "Miembro '" + miembroDTO.getNombre() + " " + miembroDTO.getApellido() + "' actualizado exitosamente.");
+                miembro = miembroService.actualizarMiembro(miembro);
+                redirectAttributes.addFlashAttribute("success", "Miembro '" + miembro.getNombre() + " " + miembro.getApellido() + "' actualizado exitosamente.");
             }
+
+            if (miembroDTO.getMembresiaId() != null) {
+                boolean paymentDataProvided = (miembroDTO.getNumeroTarjeta() != null && !miembroDTO.getNumeroTarjeta().isEmpty());
+
+                if (paymentDataProvided) {
+                    inscripcionProcesada = inscripcionMembresiaService.crearOActualizarInscripcionConPago(
+                            miembro.getId(),
+                            miembroDTO.getMembresiaId(),
+                            miembroDTO.getNumeroTarjeta(),
+                            miembroDTO.getFechaVencimiento(),
+                            miembroDTO.getCvv()
+                    );
+                    if ("COMPLETADO".equals(inscripcionProcesada.getEstado())) {
+                        redirectAttributes.addFlashAttribute("success", "Miembro '" + miembro.getNombre() + " " + miembro.getApellido() + "' registrado/actualizado y membresía pagada exitosamente. ID Inscripción: " + inscripcionProcesada.getId());
+                    } else {
+                        redirectAttributes.addFlashAttribute("info", "Membresía asignada en estado '" + inscripcionProcesada.getEstado() + "'. Si el pago fue procesado, verifique el estado.");
+                    }
+                } else {
+                    inscripcionProcesada = inscripcionMembresiaService.crearInscripcionInicial(
+                            miembro.getId(),
+                            miembroDTO.getMembresiaId()
+                    );
+                    redirectAttributes.addFlashAttribute("info", "Membresía asignada a " + miembro.getNombre() + " en estado 'PENDIENTE_PAGO'. ID Inscripción: " + inscripcionProcesada.getId());
+                }
+            } else {
+                redirectAttributes.addFlashAttribute("info", "No se seleccionó membresía para el miembro " + miembro.getNombre() + ". Solo se guardaron los datos básicos.");
+            }
+
             return "redirect:/admin/miembros/ver";
+
         } catch (IllegalArgumentException e) {
-            redirectAttributes.addFlashAttribute("error", e.getMessage());
-            model.addAttribute("miembroDTO", miembroDTO);
+            result.addError(new FieldError("miembroDTO", "global", e.getMessage()));
+            model.addAttribute("error", e.getMessage());
             model.addAttribute("modoEdicion", miembroDTO.getId() != null);
             model.addAttribute("sexoOpciones", Arrays.asList(Sexo.values()));
             model.addAttribute("membresiasDisponibles", membresiaService.obtenerMembresiasActivas());
             return "crear-editar-miembro";
         } catch (Exception e) {
-            redirectAttributes.addFlashAttribute("error", "Error interno al guardar el miembro: " + e.getMessage());
-            model.addAttribute("miembroDTO", miembroDTO);
+            e.printStackTrace();
+            result.addError(new FieldError("miembroDTO", "global", "Error interno al guardar el miembro: " + e.getMessage()));
+            model.addAttribute("error", "Error interno al guardar el miembro: " + e.getMessage());
             model.addAttribute("modoEdicion", miembroDTO.getId() != null);
             model.addAttribute("sexoOpciones", Arrays.asList(Sexo.values()));
             model.addAttribute("membresiasDisponibles", membresiaService.obtenerMembresiasActivas());

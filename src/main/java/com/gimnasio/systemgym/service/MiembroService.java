@@ -11,6 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
@@ -92,7 +93,7 @@ public class MiembroService {
 
     @Transactional(readOnly = true)
     public List<Miembro> obtenerTodosLosMiembros() {
-        return miembroRepository.findAll();
+        return miembroRepository.findAllWithInscriptionsAndMembershipDetails();
     }
 
     @Transactional
@@ -116,9 +117,9 @@ public class MiembroService {
     @Transactional(readOnly = true)
     public List<Miembro> buscarMiembros(String query) {
         if (query == null || query.trim().isEmpty()) {
-            return miembroRepository.findAll();
+            return miembroRepository.findAllWithInscriptionsAndMembershipDetails();
         }
-        return miembroRepository.findByNombreContainingIgnoreCaseOrApellidoContainingIgnoreCaseOrNumeroIdentificacionContainingIgnoreCase(query, query, query);
+        return miembroRepository.findBySearchQueryWithInscriptionsAndMembershipDetails(query);
     }
 
     @Transactional
@@ -138,8 +139,11 @@ public class MiembroService {
 
     @Transactional(readOnly = true)
     public Optional<InscripcionMembresia> obtenerMembresiaActivaActual(Miembro miembro) {
-        return inscripcionMembresiaRepository.findTopByMiembroAndEstadoOrderByFechaFinDesc(miembro, "ACTIVA")
-                .filter(insc -> insc.getFechaFin().isAfter(LocalDate.now()) || insc.getFechaFin().isEqual(LocalDate.now()));
+        return miembro.getInscripcionesMembresia().stream()
+                .filter(inscripcion -> "COMPLETADO".equalsIgnoreCase(inscripcion.getEstado()) &&
+                        inscripcion.getFechaFin() != null &&
+                        inscripcion.getFechaFin().isAfter(LocalDate.now()))
+                .max(Comparator.comparing(InscripcionMembresia::getFechaFin));
     }
 
     @Transactional(readOnly = true)

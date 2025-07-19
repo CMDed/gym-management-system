@@ -52,13 +52,18 @@
       <p th:text="${error}"></p>
     </div>
 
-    <form th:action="@{/admin/miembros/guardar}" th:object="${miembroDTO}" method="post" class="membresia-form">
+    <form id="miembroForm" th:action="@{/admin/miembros/guardar}" th:object="${miembroDTO}" method="post" class="membresia-form">
       <input type="hidden" th:field="*{id}">
 
       <div>
         <label for="tipoIdentificacion">Tipo de Identificación:</label>
-        <input type="text" id="tipoIdentificacion" th:field="*{tipoIdentificacion}"
-               th:classappend="${#fields.hasErrors('tipoIdentificacion')} ? 'is-invalid' : ''">
+        <select id="tipoIdentificacion" th:field="*{tipoIdentificacion}"
+                th:classappend="${#fields.hasErrors('tipoIdentificacion')} ? 'is-invalid' : ''">
+          <option value="">Seleccione</option>
+          <option value="DNI">DNI</option>
+          <option value="CE">Carnet de Extranjería</option>
+          <option value="PASAPORTE">Pasaporte</option>
+        </select>
         <div class="error-message" th:if="${#fields.hasErrors('tipoIdentificacion')}" th:errors="*{tipoIdentificacion}"></div>
       </div>
       <div>
@@ -139,6 +144,36 @@
         <small class="form-text-custom">Para un nuevo miembro, se asignará esta membresía en estado 'PENDIENTE_PAGO'. Para un miembro existente, si selecciona una nueva, se intentará crear una nueva inscripción.</small>
       </div>
 
+      <div class="full-width-field" id="montoPagoSection" style="display:none;">
+        <p class="monto-display">Monto de la Membresía: <span id="montoMembresiaDisplay">Cargando...</span></p>
+
+        <div class="form-group">
+          <label for="numeroTarjeta">Número de Tarjeta:</label>
+          <input type="text" id="numeroTarjeta" name="numeroTarjeta"
+                 pattern="[0-9]{16}" title="Debe ser un número de tarjeta de 16 dígitos"
+                 maxlength="16">
+          <div class="error-message" id="numeroTarjetaError" style="display:none;"></div>
+        </div>
+
+        <div class="form-grid-inline">
+          <div class="form-group">
+            <label for="fechaVencimiento">Fecha de Vencimiento (MM/AA):</label>
+            <input type="text" id="fechaVencimiento" name="fechaVencimiento"
+                   pattern="(0[1-9]|1[0-2])\/[0-9]{2}" title="Formato MM/AA (ej. 12/27)"
+                   placeholder="MM/AA" maxlength="5">
+            <div class="error-message" id="fechaVencimientoError" style="display:none;"></div>
+          </div>
+
+          <div class="form-group">
+            <label for="cvv">CVV:</label>
+            <input type="text" id="cvv" name="cvv"
+                   pattern="[0-9]{3,4}" title="Debe ser un CVV de 3 o 4 dígitos"
+                   maxlength="4">
+            <div class="error-message" id="cvvError" style="display:none;"></div>
+          </div>
+        </div>
+        <small class="form-text-custom">Los campos de pago son obligatorios si se selecciona una membresía.</small>
+      </div>
       <div class="form-buttons full-width-field">
         <button type="submit" class="submit-button">
           <i class="fas fa-save"></i> <span th:text="${modoEdicion ? 'Actualizar Miembro' : 'Registrar Miembro'}"></span>
@@ -186,5 +221,7 @@
 
   <p>© 2025 SystemGym. Todos los derechos reservados.</p>
 </footer>
+
+<script th:src="@{/js/admin-miembros-form.js}"></script>
 </body>
 </html>

@@ -2,6 +2,7 @@ package com.gimnasio.systemgym.dto;
 
 import com.gimnasio.systemgym.model.Miembro;
 import com.gimnasio.systemgym.model.InscripcionMembresia;
+import com.gimnasio.systemgym.model.Membresia;
 
 import java.time.LocalDate;
 
@@ -33,10 +34,12 @@ public class MiembroListDTO {
         this.activo = miembro.getActivo();
 
         if (membresiaActiva != null) {
-            if (membresiaActiva.getMembresia() != null) {
-                this.nombreMembresiaActiva = membresiaActiva.getMembresia().getNombrePlan();
+            Membresia membresiaAsociada = membresiaActiva.getMembresia();
+
+            if (membresiaAsociada != null) {
+                this.nombreMembresiaActiva = membresiaAsociada.getNombrePlan();
             } else {
-                this.nombreMembresiaActiva = "Membresía no cargada";
+                this.nombreMembresiaActiva = "Membresía no cargada (objeto null)";
             }
             this.fechaInicioMembresiaActiva = membresiaActiva.getFechaInicio();
             this.fechaFinMembresiaActiva = membresiaActiva.getFechaFin();

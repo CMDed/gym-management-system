@@ -52,13 +52,20 @@ public class MiembroDTO {
     @PastOrPresent(message = "La fecha de nacimiento no puede ser en el futuro")
     private LocalDate fechaNacimiento;
 
-    @NotBlank(message = "La contraseña no puede estar en blanco")
     @Size(min = 6, message = "La contraseña debe tener al menos 6 caracteres")
     private String contrasena;
 
     @NotNull(message = "El estado activo no puede ser nulo")
     private Boolean activo;
 
-    @NotNull(message = "El ID de la membresía no puede ser nulo.")
     private Long membresiaId;
+
+    @Pattern(regexp = "^[0-9]{16}$", message = "El número de tarjeta debe contener 16 dígitos.")
+    private String numeroTarjeta;
+
+    @Pattern(regexp = "^(0[1-9]|1[0-2])\\/[0-9]{2}$", message = "La fecha de vencimiento debe estar en formato MM/AA.")
+    private String fechaVencimiento;
+
+    @Pattern(regexp = "^[0-9]{3,4}$", message = "El CVV debe contener 3 o 4 dígitos.")
+    private String cvv;
 }

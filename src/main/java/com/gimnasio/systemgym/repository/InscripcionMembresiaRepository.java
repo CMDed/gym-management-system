@@ -21,4 +21,8 @@ public interface InscripcionMembresiaRepository extends JpaRepository<Inscripcio
     List<InscripcionMembresia> findByMiembroOrderByFechaCreacionDesc(Miembro miembro);
 
     List<InscripcionMembresia> findByEstadoAndFechaFinBefore(String estado, LocalDate fecha);
+
+    List<InscripcionMembresia> findByMiembroAndEstadoIn(Miembro miembro, List<String> estados);
+
+    List<InscripcionMembresia> findByEstadoAndFechaFinLessThanEqual(String estado, LocalDate fechaFin);
 }

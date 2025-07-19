@@ -24,7 +24,7 @@ public class PagoController {
         this.pagoService = pagoService;
     }
 
-    @PostMapping("/procesar") // Coincide con el fetch en pago.js
+    @PostMapping("/procesar")
     public ResponseEntity<?> procesarPago(@Valid @RequestBody PagoDTO pagoDTO) {
         try {
             Pago nuevoPago = pagoService.registrarPago(
@@ -65,7 +65,6 @@ public class PagoController {
             return new ResponseEntity<>("Error interno del servidor al eliminar pago: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
-
 
     @GetMapping
     public ResponseEntity<List<Pago>> obtenerTodosLosPagos() {
