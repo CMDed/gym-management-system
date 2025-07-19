@@ -5,9 +5,12 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
+import java.util.List;
 
 @Repository
 public interface MiembroRepository extends JpaRepository<Miembro, Long> {
     Optional<Miembro> findByCorreo(String correo);
     Optional<Miembro> findByNumeroIdentificacion(String numeroIdentificacion);
+
+    List<Miembro> findByNombreContainingIgnoreCaseOrApellidoContainingIgnoreCaseOrNumeroIdentificacionContainingIgnoreCase(String nombre, String apellido, String numeroIdentificacion);
 }

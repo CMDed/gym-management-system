@@ -33,7 +33,6 @@ public class MembresiaController {
         }
     }
 
-    //End point para obtener membresia por ID
     @GetMapping("/{id}")
     public ResponseEntity<?> obtenerMembresiaPorId(@PathVariable Long id) {
         Optional<Membresia> membresia = membresiaService.obtenerMembresiaPorId(id);
@@ -43,7 +42,6 @@ public class MembresiaController {
             return new ResponseEntity<>("Membresía no encontrada", HttpStatus.NOT_FOUND);
         }
     }
-
 
     @GetMapping
     public ResponseEntity<List<Membresia>> obtenerTodasLasMembresias() {

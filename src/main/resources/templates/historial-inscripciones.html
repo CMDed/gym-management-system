@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Historial de Membresías - <span th:text="${miembro.nombre + ' ' + miembro.apellido}"></span></title>
+  <link rel="stylesheet" href="/css/bootstrap.min.css">
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+<div th:replace="~{fragments/admin-header :: admin-header}"></div>
+
+<div class="container mt-4">
+  <h2 class="mb-4">Historial de Membresías de <span th:text="${miembro.nombre + ' ' + miembro.apellido}"></span></h2>
+
+  <div th:if="${success}" class="alert alert-success alert-dismissible fade show" role="alert">
+    <span th:text="${success}"></span>
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+  </div>
+  <div th:if="${error}" class="alert alert-danger alert-dismissible fade show" role="alert">
+    <span th:text="${error}"></span>
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+  </div>
+
+  <div class="card mb-4">
+    <div class="card-header">
+      Información Actual del Miembro
+    </div>
+    <div class="card-body">
+      <p><strong>Estado Activo:</strong>
+        <span th:if="${miembro.activo}" class="badge bg-success">Sí</span>
+        <span th:unless="${miembro.activo}" class="badge bg-danger">No</span>
+      </p>
+      <p th:if="${membresiaActiva}">
+        <strong>Membresía Activa:</strong> <span th:text="${membresiaActiva.membresia.nombrePlan}"></span>
+        <br>
+        <strong>Fecha Inicio:</strong> <span th:text="${#temporals.format(membresiaActiva.fechaInicio, 'dd-MM-yyyy')}"></span>
+        <strong>Fecha Fin:</strong> <span th:text="${#temporals.format(membresiaActiva.fechaFin, 'dd-MM-yyyy')}"></span>
+        <br>
+        <strong>Precio Pagado:</strong> <span th:text="${membresiaActiva.precioPagado}"></span>
+      </p>
+      <p th:unless="${membresiaActiva}">
+        <strong>Membresía Activa:</strong> <span class="badge bg-secondary">Ninguna</span>
+      </p>
+      <p th:if="${membresiaPendiente}">
+        <strong>Membresía Pendiente de Pago:</strong> <span th:text="${membresiaPendiente.membresia.nombrePlan}"></span> (ID: <span th:text="${membresiaPendiente.id}"></span>)
+        <br>
+        <strong>Fecha Creación:</strong> <span th:text="${#temporals.format(membresiaPendiente.fechaCreacion, 'dd-MM-yyyy HH:mm')}"></span>
+        <br>
+      <form th:action="@{/admin/miembros/inscripciones/completar-pago/{id}(id=${membresiaPendiente.id})}" method="post" class="mt-2">
+        <div class="input-group">
+          <input type="number" step="0.01" name="montoPagado" class="form-control" placeholder="Monto a pagar" required>
+          <button type="submit" class="btn btn-success">Completar Pago</button>
+        </div>
+      </form>
+      <form th:action="@{/admin/miembros/inscripciones/cambiar-estado/{id}(id=${membresiaPendiente.id}, nuevoEstado='CANCELADA')}" method="post" style="display:inline-block;" onsubmit="return confirm('¿Estás seguro de cancelar esta inscripción pendiente?');">
+        <button type="submit" class="btn btn-sm btn-danger mt-2">Cancelar Pendiente</button>
+      </form>
+      </p>
+      <p th:unless="${membresiaPendiente}">
+        <strong>Membresía Pendiente:</strong> <span class="badge bg-secondary">Ninguna</span>
+      </p>
+    </div>
+  </div>
+
+  <div class="card mb-4">
+    <div class="card-header">
+      Registrar Nueva Inscripción
+    </div>
+    <div class="card-body">
+      <form th:action="@{/admin/miembros/inscripciones/crear/{miembroId}(miembroId=${miembro.id})}" method="post">
+        <div class="mb-3">
+          <label for="membresiaId" class="form-label">Seleccionar Membresía:</label>
+          <select id="membresiaId" name="membresiaId" class="form-select" required>
+            <option value="">-- Seleccione un plan --</option>
+            <option th:each="m : ${membresiasDisponibles}" th:value="${m.id}" th:text="${m.nombrePlan + ' - ' + m.precio + ' (' + m.duracionDias + ' días)'}"></option>
+          </select>
+        </div>
+        <button type="submit" class="btn btn-primary">Crear Inscripción Pendiente</button>
+      </form>
+    </div>
+  </div>
+
+
+  <h3>Historial Detallado de Inscripciones</h3>
+  <div class="table-responsive">
+    <table class="table table-striped table-hover">
+      <thead class="table-dark">
+      <tr>
+        <th>ID Inscripción</th>
+        <th>Plan Membresía</th>
+        <th>Fecha Inicio</th>
+        <th>Fecha Fin</th>
+        <th>Precio Pagado</th>
+        <th>Estado</th>
+        <th>Fecha Creación</th>
+        <th>Acciones</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr th:each="inscripcion : ${historialInscripciones}">
+        <td th:text="${inscripcion.id}"></td>
+        <td th:text="${inscripcion.membresia.nombrePlan}"></td>
+        <td th:text="${#temporals.format(inscripcion.fechaInicio, 'dd-MM-yyyy')}"></td>
+        <td th:text="${#temporals.format(inscripcion.fechaFin, 'dd-MM-yyyy')}"></td>
+        <td th:text="${inscripcion.precioPagado}"></td>
+        <td><span class="badge" th:classappend="${inscripcion.estado == 'ACTIVA'} ? 'bg-success' : (${inscripcion.estado == 'VENCIDA'} ? 'bg-danger' : 'bg-warning')" th:text="${inscripcion.estado}"></span></td>
+        <td th:text="${#temporals.format(inscripcion.fechaCreacion, 'dd-MM-yyyy HH:mm')}"></td>
+        <td>
+          <form th:action="@{/admin/miembros/inscripciones/cambiar-estado/{id}(id=${inscripcion.id}, nuevoEstado='CANCELADA')}" method="post" style="display:inline-block;" onsubmit="return confirm('¿Estás seguro de cancelar esta inscripción?');">
+            <button type="submit" class="btn btn-sm btn-warning" th:if="${inscripcion.estado == 'ACTIVA' || inscripcion.estado == 'PENDIENTE_PAGO'}">Cancelar</button>
+          </form>
+          <form th:action="@{/admin/miembros/inscripciones/eliminar/{id}(id=${inscripcion.id})}" method="post" style="display:inline-block;" onsubmit="return confirm('¿Estás seguro de eliminar esta inscripción?');">
+            <button type="submit" class="btn btn-sm btn-danger ms-1">Eliminar</button>
+          </form>
+        </td>
+      </tr>
+      </tbody>
+    </table>
+  </div>
+  <div th:if="${historialInscripciones.isEmpty()}" class="alert alert-info mt-3" role="alert">
+    No hay inscripciones registradas para este miembro.
+  </div>
+
+  <div class="mt-4">
+    <a th:href="@{/admin/miembros/ver}" class="btn btn-secondary"><i class="fas fa-arrow-left"></i> Volver a la lista de miembros</a>
+  </div>
+</div>
+
+<div th:replace="~{fragments/footer :: footer}"></div>
+<script src="/js/bootstrap.bundle.min.js"></script>
+<script src="https://kit.fontawesome.com/your-font-awesome-kit-id.js" crossorigin="anonymous"></script>
+</body>
+</html>

@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title th:text="${modoEdicion ? 'Editar Usuario (Empleado)' : 'Registrar Nuevo Usuario (Empleado)'} + ' - Admin'"></title>
+  <link rel="stylesheet" th:href="@{/css/nuevo-estilo.css}">
+  <link rel="stylesheet" th:href="@{/css/admin-dashboard-styles.css}">
+  <link rel="stylesheet" th:href="@{/css/admin-usuarios-styles.css}"> <link rel="icon" th:href="@{/images/logo.png}" type="image/png">
+  <link href="https://fonts.googleapis.com/css2?family=Anton&display=swap" rel="stylesheet">
+</head>
+<body>
+<header>
+  <div class="logo-container">
+    <a th:href="@{/}">
+      <img th:src="@{/images/logo.png}" alt="Logo SystemGym">
+    </a>
+  </div>
+  <nav>
+    <ul>
+      <li><a th:href="@{/}">INICIO</a></li>
+      <li><a th:href="@{/membresias}">PLANES</a></li>
+      <li sec:authorize="hasRole('ADMIN')"><a th:href="@{/admin/dashboard}">ADMIN DASHBOARD</a></li>
+      <li>
+        <div class="icon-container">
+          <a th:href="@{/dashboard}">
+            <img th:src="@{/images/usuario.png}" alt="Mi Perfil" id="icono-inicio-sesion">
+          </a>
+        </div>
+      </li>
+      <li sec:authorize="!isAuthenticated()"><a th:href="@{/login}">INICIAR SESIÓN</a></li>
+      <li sec:authorize="isAuthenticated()">
+        <form th:action="@{/logout}" method="post" style="display:inline;">
+          <button type="submit" class="logout-button">CERRAR SESIÓN</button>
+        </form>
+      </li>
+    </ul>
+  </nav>
+</header>
+
+<main class="admin-dashboard-main">
+  <section class="admin-dashboard-card">
+    <h2 class="admin-welcome-title" th:text="${modoEdicion ? 'Editar Usuario (Empleado)' : 'Registrar Nuevo Usuario (Empleado)'}">Registrar Nuevo Usuario (Empleado)</h2>
+    <p class="admin-subtitle" th:text="${modoEdicion ? 'Modifica los datos del usuario/empleado.' : 'Completa los datos para registrar un nuevo usuario/empleado.'}"></p>
+
+    <div th:if="${error}" class="messages error">
+      <p th:text="${error}"></p>
+    </div>
+
+    <form th:action="@{/admin/usuarios/guardar}" th:object="${usuario}" method="post" class="usuario-form">
+      <input type="hidden" th:field="*{id}" th:if="${modoEdicion}" />
+
+      <div>
+        <label for="username">Username:</label>
+        <input type="text" id="username" th:field="*{username}" required />
+      </div>
+
+      <div th:unless="${modoEdicion}"> <label for="password">Contraseña:</label>
+        <input type="password" id="password" name="password" required />
+      </div>
+      <div th:if="${modoEdicion}"> <label for="password">Contraseña (dejar en blanco para no cambiar):</label>
+        <input type="password" id="password" name="password" th:value="${''}" /> <small style="color: #ccc; display: block; margin-top: 5px;">Deja este campo en blanco para mantener la contraseña actual.</small>
+      </div>
+
+      <div>
+        <label for="nombre">Nombre:</label>
+        <input type="text" id="nombre" th:field="*{nombre}" required />
+      </div>
+
+      <div>
+        <label for="apellido">Apellido:</label>
+        <input type="text" id="apellido" th:field="*{apellido}" required />
+      </div>
+
+      <div>
+        <label for="dni">DNI:</label>
+        <input type="text" id="dni" th:field="*{dni}" maxlength="10" /> </div>
+
+      <div>
+        <label for="email">Email:</label>
+        <input type="email" id="email" th:field="*{email}" />
+      </div>
+
+      <div>
+        <label for="telefono">Teléfono:</label>
+        <input type="text" id="telefono" th:field="*{telefono}" />
+      </div>
+
+      <div>
+        <label for="fechaContratacion">Fecha de Contratación:</label>
+        <input type="date" id="fechaContratacion" th:field="*{fechaContratacion}" />
+      </div>
+
+      <div>
+        <label for="rol">Rol:</label>
+        <select id="rol" th:field="*{rol}" required>
+          <option value="">Seleccione un rol</option>
+          <option th:each="rol : ${rolesDisponibles}"
+                  th:value="${rol}"
+                  th:text="${rol}"
+                  th:selected="${usuario.rol == rol}"></option>
+        </select>
+      </div>
+
+      <div class="checkbox-group">
+        <input type="checkbox" id="activo" th:field="*{activo}" />
+        <label for="activo">Activo</label>
+      </div>
+
+      <button type="submit" th:text="${modoEdicion ? 'Actualizar Usuario' : 'Registrar Usuario'}">Registrar Usuario</button>
+      <a th:href="@{/admin/usuarios/ver}" class="back-link">Cancelar y Volver</a>
+    </form>
+
+  </section>
+</main>
+
+<footer>
+  <div class="logo-footer">
+    <a th:href="@{/}">
+      <img th:src="@{/images/logo.png}" alt="Logo SystemGym"><br><br>
+    </a>
+  </div>
+
+  <div class="footer_container">
+    <div class="redes-sociales">
+      <strong>Redes Sociales:</strong><br><br>
+      <a href="#" target="_blank"><img th:src="@{/images/FB.png}" alt="Facebook" class="icono-red"></a>
+      <a href="https://www.instagram.com/aresfitness.peru/" target="_blank"><img th:src="@{/images/Insta.png}" alt="Instagram" class="icono-red"></a>
+      <a href="#" target="_blank"><img th:src="@{/images/Tiktok.png}" alt="Tiktok" class="icono-red"></a>
+      <a href="#" target="_blank"><img th:src="@{/images/X.png}" alt="X" class="icono-red"></a>
+      <br><br>
+      <strong>CONTÁCTANOS:</strong><br><br>
+      <a href="#" target="_blank"><img th:src="@{/images/WhatsApp.png}" alt="WhatsApp" style="width: 20px; vertical-align: middle;"></a><br><br>
+      <a href="#" target="_blank"><img th:src="@{/images/Gmail.png}" alt="Correo electrónico" style="width: 20px; vertical-align: middle;"></a>
+    </div>
+
+    <div class="footer-section">
+      <a href="#">TÉRMINOS Y CONDICIONES</a><br><br><br>
+      <a href="#">POLÍTICAS Y PRIVACIDAD</a><br><br><br>
+      <a href="#">QUEJAS Y RECLAMOS</a>
+    </div>
+
+    <div class="footer-section" style="text-align: center;">
+      <a href="#">SOPORTE TÉCNICO</a><br><br><br>
+      <a th:href="@{/}">SYSTEMGYM</a><br><br><br><br>
+      <img th:src="@{/images/LibroR.png}" alt="Libro de Reclamaciones" style="width: 150px;">
+    </div>
+  </div>
+
+  <p>© 2025 SystemGym. Todos los derechos reservados.</p>
+</footer>
+</body>
+</html>

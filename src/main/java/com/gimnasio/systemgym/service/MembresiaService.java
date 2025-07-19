@@ -59,6 +59,11 @@ public class MembresiaService {
         Membresia existente = membresiaRepository.findById(membresiaActualizada.getId())
                 .orElseThrow(() -> new IllegalArgumentException("Membresía no encontrada para actualización."));
 
+        Optional<Membresia> existingByName = membresiaRepository.findByNombrePlan(membresiaActualizada.getNombrePlan());
+        if (existingByName.isPresent() && !existingByName.get().getId().equals(membresiaActualizada.getId())) {
+            throw new IllegalArgumentException("Ya existe otra membresía con este nombre de plan.");
+        }
+
         existente.setNombrePlan(membresiaActualizada.getNombrePlan());
         existente.setDescripcion(membresiaActualizada.getDescripcion());
         existente.setPrecio(membresiaActualizada.getPrecio());

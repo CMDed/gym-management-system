@@ -11,6 +11,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.time.LocalDate;
+
 @SpringBootApplication
 public class SystemgymApplication {
 
@@ -35,8 +37,12 @@ public class SystemgymApplication {
 						"Admin",
 						"General",
 						"admin@systemgym.com",
-						true
+						true,
+						"999999999",
+						"987654321",
+						LocalDate.now()
 				);
+
 				usuarioRepository.save(admin);
 				log.info("Usuario administrador creado: " + admin.getUsername());
 			} else {

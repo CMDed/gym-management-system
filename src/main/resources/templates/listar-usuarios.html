@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gestión de Usuarios (Empleados) - Admin</title>
+  <link rel="stylesheet" th:href="@{/css/nuevo-estilo.css}">
+  <link rel="stylesheet" th:href="@{/css/admin-dashboard-styles.css}">
+  <link rel="stylesheet" th:href="@{/css/admin-usuarios-styles.css}"> <link rel="icon" th:href="@{/images/logo.png}" type="image/png">
+  <link href="https://fonts.googleapis.com/css2?family=Anton&display=swap" rel="stylesheet">
+</head>
+<body>
+<header>
+  <div class="logo-container">
+    <a th:href="@{/}">
+      <img th:src="@{/images/logo.png}" alt="Logo SystemGym">
+    </a>
+  </div>
+  <nav>
+    <ul>
+      <li><a th:href="@{/}">INICIO</a></li>
+      <li><a th:href="@{/membresias}">PLANES</a></li>
+      <li sec:authorize="hasRole('ADMIN')"><a th:href="@{/admin/dashboard}">ADMIN DASHBOARD</a></li>
+      <li>
+        <div class="icon-container">
+          <a th:href="@{/dashboard}">
+            <img th:src="@{/images/usuario.png}" alt="Mi Perfil" id="icono-inicio-sesion">
+          </a>
+        </div>
+      </li>
+      <li sec:authorize="!isAuthenticated()"><a th:href="@{/login}">INICIAR SESIÓN</a></li>
+      <li sec:authorize="isAuthenticated()">
+        <form th:action="@{/logout}" method="post" style="display:inline;">
+          <button type="submit" class="logout-button">CERRAR SESIÓN</button>
+        </form>
+      </li>
+    </ul>
+  </nav>
+</header>
+
+<main class="admin-dashboard-main">
+  <section class="admin-dashboard-card">
+    <h2 class="admin-welcome-title">Gestión de Usuarios (Empleados)</h2>
+    <p class="admin-subtitle">Administra los usuarios y empleados de tu gimnasio.</p>
+
+    <div th:if="${success}" class="messages success">
+      <p th:text="${success}"></p>
+    </div>
+    <div th:if="${error}" class="messages error">
+      <p th:text="${error}"></p>
+    </div>
+
+    <a th:href="@{/admin/usuarios/crear}" class="add-new-btn">Registrar Nuevo Usuario/Empleado</a>
+
+    <table class="usuarios-table">
+      <thead>
+      <tr>
+        <th>ID</th>
+        <th>Username</th>
+        <th>Nombre</th>
+        <th>Apellido</th>
+        <th>DNI</th>
+        <th>Email</th>
+        <th>Teléfono</th>
+        <th>Fecha Contratación</th>
+        <th>Rol</th>
+        <th>Activo</th>
+        <th>Acciones</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr th:each="usuario : ${usuarios}">
+        <td th:text="${usuario.id}">1</td>
+        <td th:text="${usuario.username}">usuario123</td>
+        <td th:text="${usuario.nombre}">Juan</td>
+        <td th:text="${usuario.apellido}">Perez</td>
+        <td th:text="${usuario.dni}">12345678</td>
+        <td th:text="${usuario.email}">juan.perez@example.com</td>
+        <td th:text="${usuario.telefono}">987654321</td>
+        <td th:text="${usuario.fechaContratacion != null ? #temporals.format(usuario.fechaContratacion, 'dd-MM-yyyy') : 'N/A'}">01-01-2023</td>
+        <td th:text="${usuario.rol}">Entrenador</td>
+        <td>
+          <span th:if="${usuario.activo}" style="color: green;">Sí</span>
+          <span th:unless="${usuario.activo}" style="color: red;">No</span>
+        </td>
+        <td class="action-buttons">
+          <a th:href="@{/admin/usuarios/editar/{id}(id=${usuario.id})}" class="edit-btn">Editar</a>
+          <form th:action="@{/admin/usuarios/eliminar/{id}(id=${usuario.id})}" method="post" onsubmit="return confirm('¿Estás seguro de que quieres eliminar a este usuario/empleado?');">
+            <button type="submit" class="delete-btn">Eliminar</button>
+          </form>
+          <form th:action="@{/admin/usuarios/cambiar-estado/{id}(id=${usuario.id})}" method="post" style="display: inline;">
+            <input type="hidden" name="activo" th:value="${!usuario.activo}" />
+            <button type="submit" th:text="${usuario.activo ? 'Desactivar' : 'Activar'}"
+                    th:class="${usuario.activo ? 'toggle-active-btn active' : 'toggle-active-btn inactive'}"></button>
+          </form>
+        </td>
+      </tr>
+      <tr th:if="${#lists.isEmpty(usuarios)}">
+        <td colspan="11">No hay usuarios (empleados) registrados.</td>
+      </tr>
+      </tbody>
+    </table>
+
+    <a th:href="@{/admin/dashboard}" class="add-new-btn" style="background-color: #333; margin-top: 30px;">Volver al Dashboard</a>
+
+  </section>
+</main>
+
+<footer>
+  <div class="logo-footer">
+    <a th:href="@{/}">
+      <img th:src="@{/images/logo.png}" alt="Logo SystemGym"><br><br>
+    </a>
+  </div>
+
+  <div class="footer_container">
+    <div class="redes-sociales">
+      <strong>Redes Sociales:</strong><br><br>
+      <a href="#" target="_blank"><img th:src="@{/images/FB.png}" alt="Facebook" class="icono-red"></a>
+      <a href="https://www.instagram.com/aresfitness.peru/" target="_blank"><img th:src="@{/images/Insta.png}" alt="Instagram" class="icono-red"></a>
+      <a href="#" target="_blank"><img th:src="@{/images/Tiktok.png}" alt="Tiktok" class="icono-red"></a>
+      <a href="#" target="_blank"><img th:src="@{/images/X.png}" alt="X" class="icono-red"></a>
+      <br><br>
+      <strong>CONTÁCTANOS:</strong><br><br>
+      <a href="#" target="_blank"><img th:src="@{/images/WhatsApp.png}" alt="WhatsApp" style="width: 20px; vertical-align: middle;"></a><br><br>
+      <a href="#" target="_blank"><img th:src="@{/images/Gmail.png}" alt="Correo electrónico" style="width: 20px; vertical-align: middle;"></a>
+    </div>
+
+    <div class="footer-section">
+      <a href="#">TÉRMINOS Y CONDICIONES</a><br><br><br>
+      <a href="#">POLÍTICAS Y PRIVACIDAD</a><br><br><br>
+      <a href="#">QUEJAS Y RECLAMOS</a>
+    </div>
+
+    <div class="footer-section" style="text-align: center;">
+      <a href="#">SOPORTE TÉCNICO</a><br><br><br>
+      <a th:href="@{/}">SYSTEMGYM</a><br><br><br><br>
+      <img th:src="@{/images/LibroR.png}" alt="Libro de Reclamaciones" style="width: 150px;">
+    </div>
+  </div>
+
+  <p>© 2025 SystemGym. Todos los derechos reservados.</p>
+</footer>
+</body>
+</html>

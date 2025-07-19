@@ -30,7 +30,6 @@ public class InscripcionMembresiaService {
         this.membresiaService = membresiaService;
     }
 
-
     @Transactional
     public InscripcionMembresia crearInscripcionInicial(Long miembroId, Long membresiaId) {
         Miembro miembro = miembroService.obtenerMiembroPorId(miembroId)
@@ -38,14 +37,24 @@ public class InscripcionMembresiaService {
         Membresia membresia = membresiaService.obtenerMembresiaPorId(membresiaId)
                 .orElseThrow(() -> new IllegalArgumentException("Membresía no encontrada para la inscripción."));
 
-        LocalDate fechaInicio = LocalDate.now();
-        LocalDate fechaFin = fechaInicio.plusDays(membresia.getDuracionDias());
+        Optional<InscripcionMembresia> activeOrPending = inscripcionMembresiaRepository
+                .findTopByMiembroAndEstadoOrderByFechaFinDesc(miembro, "ACTIVA");
+
+        if (activeOrPending.isPresent() && (activeOrPending.get().getFechaFin().isAfter(LocalDate.now()) || activeOrPending.get().getFechaFin().isEqual(LocalDate.now()))) {
+            throw new IllegalArgumentException("El miembro ya tiene una membresía activa que no ha expirado. Finaliza el: " + activeOrPending.get().getFechaFin());
+        }
+
+        Optional<InscripcionMembresia> pendingPayment = inscripcionMembresiaRepository
+                .findTopByMiembroAndEstadoOrderByFechaCreacionDesc(miembro, "PENDIENTE_PAGO");
+        if (pendingPayment.isPresent()) {
+            throw new IllegalArgumentException("El miembro ya tiene una inscripción pendiente de pago. ID: " + pendingPayment.get().getId());
+        }
 
         InscripcionMembresia inscripcion = new InscripcionMembresia();
         inscripcion.setMiembro(miembro);
         inscripcion.setMembresia(membresia);
-        inscripcion.setFechaInicio(fechaInicio);
-        inscripcion.setFechaFin(fechaFin);
+        inscripcion.setFechaInicio(LocalDate.now());
+        inscripcion.setFechaFin(LocalDate.now().plusDays(membresia.getDuracionDias()));
         inscripcion.setPrecioPagado(BigDecimal.ZERO);
         inscripcion.setEstado("PENDIENTE_PAGO");
         inscripcion.setFechaCreacion(LocalDateTime.now());
@@ -53,6 +62,30 @@ public class InscripcionMembresiaService {
         return inscripcionMembresiaRepository.save(inscripcion);
     }
 
+    @Transactional
+    public InscripcionMembresia completarPagoInscripcion(Long inscripcionId, BigDecimal montoPagado) {
+        InscripcionMembresia inscripcion = inscripcionMembresiaRepository.findById(inscripcionId)
+                .orElseThrow(() -> new IllegalArgumentException("Inscripción de membresía no encontrada."));
+
+        if (!"PENDIENTE_PAGO".equalsIgnoreCase(inscripcion.getEstado())) {
+            throw new IllegalArgumentException("La inscripción no está en estado 'PENDIENTE_PAGO'. Estado actual: " + inscripcion.getEstado());
+        }
+
+        if (montoPagado == null || montoPagado.compareTo(BigDecimal.ZERO) <= 0) {
+            throw new IllegalArgumentException("El monto pagado debe ser un valor positivo.");
+        }
+
+        if (montoPagado.compareTo(inscripcion.getMembresia().getPrecio()) < 0) {
+            throw new IllegalArgumentException("El monto pagado es menor que el precio de la membresía (" + inscripcion.getMembresia().getPrecio() + ").");
+        }
+
+        inscripcion.setPrecioPagado(montoPagado);
+        inscripcion.setEstado("ACTIVA");
+        inscripcion.setFechaInicio(LocalDate.now());
+        inscripcion.setFechaFin(LocalDate.now().plusDays(inscripcion.getMembresia().getDuracionDias()));
+
+        return inscripcionMembresiaRepository.save(inscripcion);
+    }
 
     @Transactional
     public InscripcionMembresia crearInscripcion(Long miembroId, Long membresiaId, BigDecimal precioPagado) {
@@ -61,14 +94,27 @@ public class InscripcionMembresiaService {
         Membresia membresia = membresiaService.obtenerMembresiaPorId(membresiaId)
                 .orElseThrow(() -> new IllegalArgumentException("Membresía no encontrada."));
 
-        LocalDate fechaInicio = LocalDate.now();
-        LocalDate fechaFin = fechaInicio.plusDays(membresia.getDuracionDias());
+        if (precioPagado == null || precioPagado.compareTo(BigDecimal.ZERO) < 0) {
+            throw new IllegalArgumentException("El precio pagado no puede ser nulo o negativo.");
+        }
+
+        Optional<InscripcionMembresia> activeMembership = inscripcionMembresiaRepository
+                .findTopByMiembroAndEstadoOrderByFechaFinDesc(miembro, "ACTIVA")
+                .filter(insc -> insc.getFechaFin().isAfter(LocalDate.now()) || insc.getFechaFin().isEqual(LocalDate.now()));
+
+        if (activeMembership.isPresent()) {
+            throw new IllegalArgumentException("El miembro ya tiene una membresía activa que termina el: " + activeMembership.get().getFechaFin());
+        }
+
+        if (precioPagado.compareTo(membresia.getPrecio()) < 0) {
+            throw new IllegalArgumentException("El monto pagado (" + precioPagado + ") es menor que el precio de la membresía (" + membresia.getPrecio() + ").");
+        }
 
         InscripcionMembresia inscripcion = new InscripcionMembresia();
         inscripcion.setMiembro(miembro);
         inscripcion.setMembresia(membresia);
-        inscripcion.setFechaInicio(fechaInicio);
-        inscripcion.setFechaFin(fechaFin);
+        inscripcion.setFechaInicio(LocalDate.now());
+        inscripcion.setFechaFin(LocalDate.now().plusDays(membresia.getDuracionDias()));
         inscripcion.setPrecioPagado(precioPagado);
         inscripcion.setEstado("ACTIVA");
         inscripcion.setFechaCreacion(LocalDateTime.now());
@@ -93,7 +139,7 @@ public class InscripcionMembresiaService {
     public List<InscripcionMembresia> obtenerInscripcionesPorMiembro(Long miembroId) {
         Miembro miembro = miembroService.obtenerMiembroPorId(miembroId)
                 .orElseThrow(() -> new IllegalArgumentException("Miembro no encontrado."));
-        return inscripcionMembresiaRepository.findByMiembro(miembro);
+        return inscripcionMembresiaRepository.findByMiembroOrderByFechaCreacionDesc(miembro);
     }
 
     @Transactional(readOnly = true)
@@ -105,34 +151,22 @@ public class InscripcionMembresiaService {
     public InscripcionMembresia actualizarEstadoInscripcion(Long id, String nuevoEstado) {
         InscripcionMembresia inscripcion = inscripcionMembresiaRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Inscripción no encontrada."));
-        inscripcion.setEstado(nuevoEstado);
+
+        String estadoNormalizado = nuevoEstado.toUpperCase();
+
+        inscripcion.setEstado(estadoNormalizado);
         return inscripcionMembresiaRepository.save(inscripcion);
     }
-
-
-    @Transactional
-    public InscripcionMembresia completarPagoInscripcion(Long inscripcionId, BigDecimal montoPagado) {
-        InscripcionMembresia inscripcion = inscripcionMembresiaRepository.findById(inscripcionId)
-                .orElseThrow(() -> new IllegalArgumentException("Inscripción de membresía no encontrada."));
-
-        inscripcion.setPrecioPagado(montoPagado);
-        inscripcion.setEstado("ACTIVA");
-
-
-        return inscripcionMembresiaRepository.save(inscripcion);
-    }
-
 
     @Transactional
     public void actualizarEstadosMembresiasVencidas() {
-        List<InscripcionMembresia> inscripcionesActivas = inscripcionMembresiaRepository.findByEstado("ACTIVA");
         LocalDate hoy = LocalDate.now();
+        List<InscripcionMembresia> inscripcionesActivasVencidas = inscripcionMembresiaRepository
+                .findByEstadoAndFechaFinBefore("ACTIVA", hoy);
 
-        for (InscripcionMembresia inscripcion : inscripcionesActivas) {
-            if (inscripcion.getFechaFin().isBefore(hoy)) {
-                inscripcion.setEstado("VENCIDA");
-                inscripcionMembresiaRepository.save(inscripcion);
-            }
+        for (InscripcionMembresia inscripcion : inscripcionesActivasVencidas) {
+            inscripcion.setEstado("VENCIDA");
+            inscripcionMembresiaRepository.save(inscripcion);
         }
     }
 
@@ -141,7 +175,8 @@ public class InscripcionMembresiaService {
         Miembro miembro = miembroService.obtenerMiembroPorId(miembroId)
                 .orElseThrow(() -> new IllegalArgumentException("Miembro no encontrado."));
 
-        return inscripcionMembresiaRepository.findTopByMiembroAndEstadoOrderByFechaFinDesc(miembro, "ACTIVA");
+        return inscripcionMembresiaRepository.findTopByMiembroAndEstadoOrderByFechaFinDesc(miembro, "ACTIVA")
+                .filter(insc -> insc.getFechaFin().isAfter(LocalDate.now()) || insc.getFechaFin().isEqual(LocalDate.now()));
     }
 
     @Transactional(readOnly = true)
@@ -150,8 +185,5 @@ public class InscripcionMembresiaService {
                 .orElseThrow(() -> new IllegalArgumentException("Miembro no encontrado."));
 
         return inscripcionMembresiaRepository.findTopByMiembroAndEstadoOrderByFechaCreacionDesc(miembro, "PENDIENTE_PAGO");
-
     }
-
-
 }

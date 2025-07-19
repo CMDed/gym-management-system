@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>...</title>
+  <link rel="stylesheet" th:href="@{/css/nuevo-estilo.css}">
+  <link rel="stylesheet" th:href="@{/css/admin-styles.css}">
+  <link rel="stylesheet" th:href="@{/css/admin-membresias-styles.css}">
+  <link rel="icon" th:href="@{/images/logo.png}" type="image/png">
+  <link href="https://fonts.googleapis.com/css2?family=Anton&display=swap" rel="stylesheet">
+  <script src="https://kit.fontawesome.com/your-font-awesome-kit-id.js" crossorigin="anonymous"></script>
+</head>
+<body>
+<header>
+  <div class="logo-container">
+    <a th:href="@{/}">
+      <img th:src="@{/images/logo.png}" alt="Logo SystemGym">
+    </a>
+  </div>
+  <nav>
+    <ul>
+      <li><a th:href="@{/}">INICIO</a></li>
+      <li><a th:href="@{/membresias}">PLANES</a></li>
+      <li sec:authorize="hasRole('ADMIN')"><a th:href="@{/admin/dashboard}">ADMIN DASHBOARD</a></li>
+      <li>
+        <div class="icon-container">
+          <a th:href="@{/dashboard}">
+            <img th:src="@{/images/usuario.png}" alt="Mi Perfil" id="icono-inicio-sesion">
+          </a>
+        </div>
+      </li>
+      <li sec:authorize="!isAuthenticated()"><a th:href="@{/login}">INICIAR SESIÓN</a></li>
+      <li sec:authorize="isAuthenticated()">
+        <form th:action="@{/logout}" method="post" style="display:inline;">
+          <button type="submit" class="logout-button">CERRAR SESIÓN</button>
+        </form>
+      </li>
+    </ul>
+  </nav>
+</header>
+
+<main class="admin-dashboard-main">
+  <section class="admin-dashboard-card">
+    <h2 class="admin-welcome-title">Gestión de Miembros</h2>
+    <p class="admin-subtitle">Administra los miembros de tu gimnasio.</p>
+
+    <div th:if="${success}" class="messages success">
+      <p th:text="${success}"></p>
+    </div>
+    <div th:if="${error}" class="messages error">
+      <p th:text="${error}"></p>
+    </div>
+
+    <div class="action-bar">
+      <a th:href="@{/admin/miembros/crear}" class="add-new-btn">
+        <i class="fas fa-plus"></i> Registrar Nuevo Miembro
+      </a>
+      <form th:action="@{/admin/miembros/ver}" method="get" class="search-form">
+        <input type="text" name="query" placeholder="Buscar por Nombre, Apellido, ID" th:value="${query}">
+        <button type="submit" class="action-button search-button">Buscar</button>
+      </form>
+    </div>
+
+    <div class="table-container">
+      <table class="membresias-table">
+        <thead>
+        <tr>
+          <th>ID</th>
+          <th>Nombre Completo</th>
+          <th>Identificación</th>
+          <th>Correo</th>
+          <th>Teléfono</th>
+          <th>Membresía Activa</th>
+          <th>Fin Membresía</th>
+          <th>Estado</th>
+          <th>Acciones</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="miembro : ${miembros}">
+          <td th:text="${miembro.id}">1</td>
+          <td th:text="${miembro.nombreCompleto}">Juan Pérez</td>
+          <td th:text="${miembro.numeroIdentificacion}">123456789</td>
+          <td th:text="${miembro.correo}">juan@example.com</td>
+          <td th:text="${miembro.telefono}">987654321</td>
+          <td th:text="${miembro.nombreMembresiaActiva}">Básica</td>
+          <td th:text="${miembro.fechaFinMembresiaActiva}">2025-12-31</td>
+          <td th:text="${miembro.estadoMembresiaActiva}">ACTIVO</td>
+          <td>
+            <div class="action-buttons">
+              <a th:href="@{/admin/miembros/editar/{id}(id=${miembro.id})}" class="edit-btn" title="Editar Miembro"><i class="fas fa-edit"></i> Editar</a>
+              <button type="button" class="delete-btn" th:data-id="${miembro.id}" onclick="confirmDelete(this)" title="Eliminar Miembro"><i class="fas fa-trash-alt"></i> Eliminar</button>
+            </div>
+          </td>
+        </tr>
+        </tbody>
+      </table>
+    </div>
+    <div th:if="${miembros.isEmpty()}" class="no-results-message">
+      <p>No se encontraron miembros.</p>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="logo-footer">
+    <a th:href="@{/}">
+      <img th:src="@{/images/logo.png}" alt="Logo SystemGym"><br><br>
+    </a>
+  </div>
+
+  <div class="footer_container">
+    <div class="redes-sociales">
+      <strong>Redes Sociales:</strong><br><br>
+      <a href="#" target="_blank"><img th:src="@{/images/FB.png}" alt="Facebook" class="icono-red"></a>
+      <a href="https://www.instagram.com/aresfitness.peru/" target="_blank"><img th:src="@{/images/Insta.png}" alt="Instagram" class="icono-red"></a>
+      <a href="#" target="_blank"><img th:src="@{/images/Tiktok.png}" alt="Tiktok" class="icono-red"></a>
+      <a href="#" target="_blank"><img th:src="@{/images/X.png}" alt="X" class="icono-red"></a>
+      <br><br>
+      <strong>CONTÁCTANOS:</strong><br><br>
+      <a href="#" target="_blank"><img th:src="@{/images/WhatsApp.png}" alt="WhatsApp" style="width: 20px; vertical-align: middle;"></a><br><br>
+      <a href="#" target="_blank"><img th:src="@{/images/Gmail.png}" alt="Correo electrónico" style="width: 20px; vertical-align: middle;"></a>
+    </div>
+
+    <div class="footer-section">
+      <a href="#">TÉRMINOS Y CONDICIONES</a><br><br><br>
+      <a href="#">POLÍTICAS Y PRIVACIDAD</a><br><br><br>
+      <a href="#">QUEJAS Y RECLAMOS</a>
+    </div>
+
+    <div class="footer-section" style="text-align: center;">
+      <a href="#">SOPORTE TÉCNICO</a><br><br><br>
+      <a th:href="@{/}">SYSTEMGYM</a><br><br><br><br>
+      <img th:src="@{/images/LibroR.png}" alt="Libro de Reclamaciones" style="width: 150px;">
+    </div>
+  </div>
+
+  <p>© 2025 SystemGym. Todos los derechos reservados.</p>
+</footer>
+
+<script>
+  function confirmDelete(button) {
+    const miembroId = button.getAttribute('data-id');
+    if (confirm('¿Estás seguro de que quieres eliminar este miembro? Esta acción no se puede deshacer.')) {
+      // Si confirmas, crea un formulario dinámicamente y envíalo
+      const form = document.createElement('form');
+      form.method = 'post';
+      form.action = '/admin/miembros/eliminar/' + miembroId; // Asegúrate de que esta URL sea correcta para tu controlador
+      document.body.appendChild(form);
+      form.submit();
+    }
+  }
+</script>
+</body>
+</html>

@@ -29,6 +29,9 @@ public class UsuarioService {
         if (usuario.getEmail() != null && usuarioRepository.findByEmail(usuario.getEmail()).isPresent()) {
             throw new IllegalArgumentException("El email ya está registrado.");
         }
+        if (usuario.getDni() != null && !usuario.getDni().trim().isEmpty() && usuarioRepository.findByDni(usuario.getDni()).isPresent()) {
+            throw new IllegalArgumentException("El DNI ya está registrado para otro usuario.");
+        }
 
         usuario.setPassword(passwordEncoder.encode(usuario.getPassword()));
         if (usuario.getActivo() == null) {
@@ -52,16 +55,26 @@ public class UsuarioService {
         return usuarioRepository.findAll();
     }
 
+    @Transactional(readOnly = true)
+    public List<Usuario> obtenerUsuariosPorRol(String rol) {
+        return usuarioRepository.findByRol(rol);
+    }
+
     @Transactional
     public Usuario actualizarUsuario(Usuario usuarioActualizado) {
-        if (usuarioActualizado.getId() == null || !usuarioRepository.existsById(usuarioActualizado.getId())) {
-            throw new IllegalArgumentException("El usuario a actualizar no existe o no tiene un ID válido.");
+        if (usuarioActualizado.getId() == null) {
+            throw new IllegalArgumentException("El ID del usuario a actualizar no puede ser nulo.");
         }
+
         Usuario existente = usuarioRepository.findById(usuarioActualizado.getId())
                 .orElseThrow(() -> new IllegalArgumentException("Usuario no encontrado para actualización."));
 
-        existente.setNombre(usuarioActualizado.getNombre());
-        existente.setApellido(usuarioActualizado.getApellido());
+        if (!existente.getUsername().equals(usuarioActualizado.getUsername())) {
+            if (usuarioRepository.findByUsername(usuarioActualizado.getUsername()).isPresent()) {
+                throw new IllegalArgumentException("El nuevo nombre de usuario ya existe.");
+            }
+            existente.setUsername(usuarioActualizado.getUsername());
+        }
 
         if (usuarioActualizado.getEmail() != null && !usuarioActualizado.getEmail().equals(existente.getEmail())) {
             if (usuarioRepository.findByEmail(usuarioActualizado.getEmail()).isPresent()) {
@@ -69,8 +82,27 @@ public class UsuarioService {
             }
             existente.setEmail(usuarioActualizado.getEmail());
         }
+
+        if (usuarioActualizado.getDni() != null && !usuarioActualizado.getDni().trim().isEmpty() &&
+                !usuarioActualizado.getDni().equals(existente.getDni())) {
+            if (usuarioRepository.findByDni(usuarioActualizado.getDni()).isPresent()) {
+                throw new IllegalArgumentException("El nuevo DNI ya está registrado para otro usuario.");
+            }
+            existente.setDni(usuarioActualizado.getDni());
+        } else if (usuarioActualizado.getDni() != null && usuarioActualizado.getDni().trim().isEmpty()) {
+            existente.setDni(null);
+        }
+
+        if (usuarioActualizado.getPassword() != null && !usuarioActualizado.getPassword().isEmpty()) {
+            existente.setPassword(passwordEncoder.encode(usuarioActualizado.getPassword()));
+        }
+
+        existente.setNombre(usuarioActualizado.getNombre());
+        existente.setApellido(usuarioActualizado.getApellido());
         existente.setRol(usuarioActualizado.getRol());
         existente.setActivo(usuarioActualizado.getActivo());
+        existente.setTelefono(usuarioActualizado.getTelefono());
+        existente.setFechaContratacion(usuarioActualizado.getFechaContratacion());
 
         return usuarioRepository.save(existente);
     }

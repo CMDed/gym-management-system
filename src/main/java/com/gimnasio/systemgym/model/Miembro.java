@@ -1,5 +1,6 @@
 package com.gimnasio.systemgym.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -7,6 +8,7 @@ import lombok.AllArgsConstructor;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @Table(name = "miembros")
@@ -53,9 +55,12 @@ public class Miembro {
     @Column(name = "activo", nullable = false)
     private Boolean activo;
 
-    // **** AÑADE ESTE CAMPO ****
     @Column(name = "rol", nullable = false, length = 50)
     private String rol = "MIEMBRO";
+
+    @JsonIgnore
+    @OneToMany(mappedBy = "miembro", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<InscripcionMembresia> inscripcionesMembresia;
 
     public enum Sexo {
         MASCULINO,

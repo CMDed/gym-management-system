@@ -5,6 +5,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
 
+import java.time.LocalDate;
+
 @Entity
 @Table(name = "usuarios")
 @Data
@@ -37,4 +39,12 @@ public class Usuario {
     @Column(name = "activo", nullable = false)
     private Boolean activo;
 
+    @Column(name = "dni", unique = true, length = 10)
+    private String dni;
+
+    @Column(name = "telefono", length = 20)
+    private String telefono;
+
+    @Column(name = "fecha_contratacion")
+    private LocalDate fechaContratacion;
 }

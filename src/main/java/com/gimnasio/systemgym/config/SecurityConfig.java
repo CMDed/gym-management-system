@@ -5,18 +5,18 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
-import org.springframework.security.web.header.writers.frameoptions.XFrameOptionsHeaderWriter;
-import org.springframework.security.web.header.writers.frameoptions.XFrameOptionsHeaderWriter.XFrameOptionsMode;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 @Configuration
 @EnableWebSecurity
+@EnableMethodSecurity
 public class SecurityConfig {
 
     private final CombinedUserDetailsService combinedUserDetailsService;
@@ -46,17 +46,23 @@ public class SecurityConfig {
         http
                 .csrf(csrf -> csrf.disable())
                 .headers(headers -> headers
-                        .addHeaderWriter(new XFrameOptionsHeaderWriter(XFrameOptionsMode.SAMEORIGIN))
+                        .frameOptions(frameOptions -> frameOptions.sameOrigin())
                 )
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers(
                                 "/css/**", "/js/**", "/images/**",
-                                "/", "/membresias", "/registro-miembro", "/pago",
+                                "/",
+                                "/membresias",
+                                "/registro-miembro",
                                 "/login",
-                                "/api/**",
+                                "/error",
                                 "/h2-console/**",
-                                "/error"
+                                "/api/membresias/activas"
                         ).permitAll()
+                        .requestMatchers("/api/miembros/registrar").permitAll()
+                        .requestMatchers("/api/miembros/**").hasAnyRole("ADMIN", "RECEPCIONISTA", "MIEMBRO")
+                        .requestMatchers("/api/membresias/**").hasAnyRole("ADMIN", "RECEPCIONISTA", "MIEMBRO")
+                        .requestMatchers("/api/inscripciones/**").hasAnyRole("ADMIN", "RECEPCIONISTA", "MIEMBRO")
                         .requestMatchers("/admin/**").hasRole("ADMIN")
                         .requestMatchers("/dashboard").authenticated()
                         .anyRequest().authenticated()
@@ -71,6 +77,8 @@ public class SecurityConfig {
                 .logout(logout -> logout
                         .logoutRequestMatcher(new AntPathRequestMatcher("/logout"))
                         .logoutSuccessUrl("/login?logout=true")
+                        .deleteCookies("JSESSIONID")
+                        .invalidateHttpSession(true)
                         .permitAll()
                 );
 

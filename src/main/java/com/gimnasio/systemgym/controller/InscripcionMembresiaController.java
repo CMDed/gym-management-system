@@ -22,7 +22,6 @@ public class InscripcionMembresiaController {
         this.inscripcionMembresiaService = inscripcionMembresiaService;
     }
 
-
     @PostMapping("/iniciar")
     public ResponseEntity<?> iniciarNuevaInscripcion(
             @RequestParam Long miembroId,
@@ -36,8 +35,6 @@ public class InscripcionMembresiaController {
             return new ResponseEntity<>("Error al iniciar la inscripción: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
-
-
 
     @PutMapping("/{id}/completar-pago")
     public ResponseEntity<?> completarPagoInscripcion(
@@ -53,12 +50,11 @@ public class InscripcionMembresiaController {
         }
     }
 
-
     @PostMapping("/directa")
     public ResponseEntity<?> crearInscripcionDirecta(
-                                                      @RequestParam Long miembroId,
-                                                      @RequestParam Long membresiaId,
-                                                      @RequestParam BigDecimal precioPagado) {
+            @RequestParam Long miembroId,
+            @RequestParam Long membresiaId,
+            @RequestParam BigDecimal precioPagado) {
         try {
             InscripcionMembresia nuevaInscripcion = inscripcionMembresiaService.crearInscripcion(miembroId, membresiaId, precioPagado);
             return new ResponseEntity<>(nuevaInscripcion, HttpStatus.CREATED);
@@ -68,7 +64,6 @@ public class InscripcionMembresiaController {
             return new ResponseEntity<>("Error interno del servidor al crear inscripción directa: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
-
 
     @GetMapping("/{id}")
     public ResponseEntity<?> obtenerInscripcionPorId(@PathVariable Long id) {
@@ -121,6 +116,16 @@ public class InscripcionMembresiaController {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         } catch (Exception e) {
             return new ResponseEntity<>("Error interno del servidor al actualizar estado de inscripción: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @PostMapping("/actualizar-vencidas")
+    public ResponseEntity<?> actualizarMembresiasVencidas() {
+        try {
+            inscripcionMembresiaService.actualizarEstadosMembresiasVencidas();
+            return new ResponseEntity<>("Estados de membresías vencidas actualizados exitosamente.", HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>("Error al actualizar estados de membresías vencidas: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 }

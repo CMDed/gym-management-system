@@ -35,6 +35,9 @@ public class UsuarioController {
             nuevoUsuario.setEmail(usuarioDTO.getEmail());
             nuevoUsuario.setActivo(usuarioDTO.getActivo());
 
+            nuevoUsuario.setDni(usuarioDTO.getDni());
+            nuevoUsuario.setTelefono(usuarioDTO.getTelefono());
+            nuevoUsuario.setFechaContratacion(usuarioDTO.getFechaContratacion());
 
             Usuario usuarioGuardado = usuarioService.crearUsuario(nuevoUsuario);
             return new ResponseEntity<>(usuarioGuardado, HttpStatus.CREATED);
@@ -73,7 +76,6 @@ public class UsuarioController {
             Usuario usuarioExistente = usuarioService.obtenerUsuarioPorId(id)
                     .orElseThrow(() -> new IllegalArgumentException("Usuario no encontrado para actualización."));
 
-
             usuarioExistente.setUsername(usuarioDTO.getUsername());
             usuarioExistente.setEmail(usuarioDTO.getEmail());
             usuarioExistente.setRol(usuarioDTO.getRol());
@@ -81,6 +83,9 @@ public class UsuarioController {
             usuarioExistente.setApellido(usuarioDTO.getApellido());
             usuarioExistente.setActivo(usuarioDTO.getActivo());
 
+            usuarioExistente.setDni(usuarioDTO.getDni());
+            usuarioExistente.setTelefono(usuarioDTO.getTelefono());
+            usuarioExistente.setFechaContratacion(usuarioDTO.getFechaContratacion());
 
             if (usuarioDTO.getPassword() != null && !usuarioDTO.getPassword().isEmpty()) {
                 usuarioExistente.setPassword(usuarioDTO.getPassword());

@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title th:text="${modoEdicion ? 'Editar Miembro' : 'Registrar Nuevo Miembro'} + ' - Admin'"></title>
+  <link rel="stylesheet" th:href="@{/css/nuevo-estilo.css}">
+  <link rel="stylesheet" th:href="@{/css/admin-dashboard-styles.css}">
+  <link rel="stylesheet" th:href="@{/css/admin-membresias-styles.css}">
+  <link rel="icon" th:href="@{/images/logo.png}" type="image/png">
+  <link href="https://fonts.googleapis.com/css2?family=Anton&display=swap" rel="stylesheet">
+  <script src="https://kit.fontawesome.com/your-font-awesome-kit-id.js" crossorigin="anonymous"></script>
+</head>
+<body>
+<header>
+  <div class="logo-container">
+    <a th:href="@{/}">
+      <img th:src="@{/images/logo.png}" alt="Logo SystemGym">
+    </a>
+  </div>
+  <nav>
+    <ul>
+      <li><a th:href="@{/}">INICIO</a></li>
+      <li><a th:href="@{/membresias}">PLANES</a></li>
+      <li sec:authorize="hasRole('ADMIN')"><a th:href="@{/admin/dashboard}">ADMIN DASHBOARD</a></li>
+      <li>
+        <div class="icon-container">
+          <a th:href="@{/dashboard}">
+            <img th:src="@{/images/usuario.png}" alt="Mi Perfil" id="icono-inicio-sesion">
+          </a>
+        </div>
+      </li>
+      <li sec:authorize="!isAuthenticated()"><a th:href="@{/login}">INICIAR SESIÓN</a></li>
+      <li sec:authorize="isAuthenticated()">
+        <form th:action="@{/logout}" method="post" style="display:inline;">
+          <button type="submit" class="logout-button">CERRAR SESIÓN</button>
+        </form>
+      </li>
+    </ul>
+  </nav>
+</header>
+
+<main class="admin-dashboard-main">
+  <section class="admin-dashboard-card">
+    <h2 class="admin-welcome-title" th:text="${modoEdicion ? 'Editar Miembro' : 'Registrar Nuevo Miembro'}"></h2>
+    <p class="admin-subtitle" th:text="${modoEdicion ? 'Modifica los detalles del miembro.' : 'Completa los datos para añadir un nuevo miembro.'}"></p>
+
+    <div th:if="${success}" class="messages success">
+      <p th:text="${success}"></p>
+    </div>
+    <div th:if="${error}" class="messages error">
+      <p th:text="${error}"></p>
+    </div>
+
+    <form th:action="@{/admin/miembros/guardar}" th:object="${miembroDTO}" method="post" class="membresia-form">
+      <input type="hidden" th:field="*{id}">
+
+      <div>
+        <label for="tipoIdentificacion">Tipo de Identificación:</label>
+        <input type="text" id="tipoIdentificacion" th:field="*{tipoIdentificacion}"
+               th:classappend="${#fields.hasErrors('tipoIdentificacion')} ? 'is-invalid' : ''">
+        <div class="error-message" th:if="${#fields.hasErrors('tipoIdentificacion')}" th:errors="*{tipoIdentificacion}"></div>
+      </div>
+      <div>
+        <label for="numeroIdentificacion">Número de Identificación:</label>
+        <input type="text" id="numeroIdentificacion" th:field="*{numeroIdentificacion}"
+               th:classappend="${#fields.hasErrors('numeroIdentificacion')} ? 'is-invalid' : ''">
+        <div class="error-message" th:if="${#fields.hasErrors('numeroIdentificacion')}" th:errors="*{numeroIdentificacion}"></div>
+      </div>
+
+      <div>
+        <label for="nombre">Nombre:</label>
+        <input type="text" id="nombre" th:field="*{nombre}"
+               th:classappend="${#fields.hasErrors('nombre')} ? 'is-invalid' : ''">
+        <div class="error-message" th:if="${#fields.hasErrors('nombre')}" th:errors="*{nombre}"></div>
+      </div>
+      <div>
+        <label for="apellido">Apellido:</label>
+        <input type="text" id="apellido" th:field="*{apellido}"
+               th:classappend="${#fields.hasErrors('apellido')} ? 'is-invalid' : ''">
+        <div class="error-message" th:if="${#fields.hasErrors('apellido')}" th:errors="*{apellido}"></div>
+      </div>
+
+      <div>
+        <label for="correo">Correo Electrónico:</label>
+        <input type="email" id="correo" th:field="*{correo}"
+               th:classappend="${#fields.hasErrors('correo')} ? 'is-invalid' : ''">
+        <div class="error-message" th:if="${#fields.hasErrors('correo')}" th:errors="*{correo}"></div>
+      </div>
+      <div>
+        <label for="telefono">Teléfono:</label>
+        <input type="text" id="telefono" th:field="*{telefono}"
+               th:classappend="${#fields.hasErrors('telefono')} ? 'is-invalid' : ''">
+        <div class="error-message" th:if="${#fields.hasErrors('telefono')}" th:errors="*{telefono}"></div>
+      </div>
+
+      <div>
+        <label for="sexo">Sexo:</label>
+        <select id="sexo" th:field="*{sexo}" th:classappend="${#fields.hasErrors('sexo')} ? 'is-invalid' : ''">
+          <option value="">Seleccione...</option>
+          <option th:each="s : ${sexoOpciones}" th:value="${s}" th:text="${s}"></option>
+        </select>
+        <div class="error-message" th:if="${#fields.hasErrors('sexo')}" th:errors="*{sexo}"></div>
+      </div>
+      <div>
+        <label for="fechaNacimiento">Fecha de Nacimiento:</label>
+        <input type="date" id="fechaNacimiento" th:field="*{fechaNacimiento}"
+               th:classappend="${#fields.hasErrors('fechaNacimiento')} ? 'is-invalid' : ''">
+        <div class="error-message" th:if="${#fields.hasErrors('fechaNacimiento')}" th:errors="*{fechaNacimiento}"></div>
+      </div>
+
+      <div>
+        <label for="contrasena">Contraseña: <span th:if="${modoEdicion}" class="text-muted">(Dejar en blanco para no cambiar)</span></label>
+        <input type="password" id="contrasena" th:field="*{contrasena}"
+               th:classappend="${#fields.hasErrors('contrasena')} ? 'is-invalid' : ''"
+               th:required="${!modoEdicion}">
+        <div class="error-message" th:if="${#fields.hasErrors('contrasena')}" th:errors="*{contrasena}"></div>
+      </div>
+      <div>
+        <label for="activo">Estado Activo:</label>
+        <select id="activo" th:field="*{activo}" th:classappend="${#fields.hasErrors('activo')} ? 'is-invalid' : ''">
+          <option value="">Seleccione...</option>
+          <option value="true">Sí</option>
+          <option value="false">No</option>
+        </select>
+        <div class="error-message" th:if="${#fields.hasErrors('activo')}" th:errors="*{activo}"></div>
+      </div>
+
+      <div class="full-width-field" th:if="${!modoEdicion || (modoEdicion and membresiasDisponibles.size() > 0)}">
+        <label for="membresiaId">Membresía Inicial (solo para creación o cambio de plan):</label>
+        <select id="membresiaId" th:field="*{membresiaId}" th:classappend="${#fields.hasErrors('membresiaId')} ? 'is-invalid' : ''">
+          <option value="">Seleccione una membresía...</option>
+          <option th:each="membresia : ${membresiasDisponibles}"
+                  th:value="${membresia.id}"
+                  th:text="${membresia.nombrePlan + ' (' + membresia.precio + ' - ' + membresia.duracionDias + ' días)'}">
+          </option>
+        </select>
+        <div class="error-message" th:if="${#fields.hasErrors('membresiaId')}" th:errors="*{membresiaId}"></div>
+        <small class="form-text-custom">Para un nuevo miembro, se asignará esta membresía en estado 'PENDIENTE_PAGO'. Para un miembro existente, si selecciona una nueva, se intentará crear una nueva inscripción.</small>
+      </div>
+
+      <div class="form-buttons full-width-field">
+        <button type="submit" class="submit-button">
+          <i class="fas fa-save"></i> <span th:text="${modoEdicion ? 'Actualizar Miembro' : 'Registrar Miembro'}"></span>
+        </button>
+        <a th:href="@{/admin/miembros/ver}" class="back-link">
+          <i class="fas fa-times-circle"></i> Cancelar
+        </a>
+      </div>
+    </form>
+  </section>
+</main>
+
+<footer>
+  <div class="logo-footer">
+    <a th:href="@{/}">
+      <img th:src="@{/images/logo.png}" alt="Logo SystemGym"><br><br>
+    </a>
+  </div>
+
+  <div class="footer_container">
+    <div class="redes-sociales">
+      <strong>Redes Sociales:</strong><br><br>
+      <a href="#" target="_blank"><img th:src="@{/images/FB.png}" alt="Facebook" class="icono-red"></a>
+      <a href="https://www.instagram.com/aresfitness.peru/" target="_blank"><img th:src="@{/images/Insta.png}" alt="Instagram" class="icono-red"></a>
+      <a href="#" target="_blank"><img th:src="@{/images/Tiktok.png}" alt="Tiktok" class="icono-red"></a>
+      <a href="#" target="_blank"><img th:src="@{/images/X.png}" alt="X" class="icono-red"></a>
+      <br><br>
+      <strong>CONTÁCTANOS:</strong><br><br>
+      <a href="#" target="_blank"><img th:src="@{/images/WhatsApp.png}" alt="WhatsApp" style="width: 20px; vertical-align: middle;"></a><br><br>
+      <a href="#" target="_blank"><img th:src="@{/images/Gmail.png}" alt="Correo electrónico" style="width: 20px; vertical-align: middle;"></a>
+    </div>
+
+    <div class="footer-section">
+      <a href="#">TÉRMINOS Y CONDICIONES</a><br><br><br>
+      <a href="#">POLÍTICAS Y PRIVACIDAD</a><br><br><br>
+      <a href="#">QUEJAS Y RECLAMOS</a>
+    </div>
+
+    <div class="footer-section" style="text-align: center;">
+      <a href="#">SOPORTE TÉCNICO</a><br><br><br>
+      <a th:href="@{/}">SYSTEMGYM</a><br><br><br><br>
+      <img th:src="@{/images/LibroR.png}" alt="Libro de Reclamaciones" style="width: 150px;">
+    </div>
+  </div>
+
+  <p>© 2025 SystemGym. Todos los derechos reservados.</p>
+</footer>
+</body>
+</html>
